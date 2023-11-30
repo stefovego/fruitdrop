@@ -1,7 +1,7 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
 
-use crate::MainCamera;
+use crate::camera::MainCamera;
 
 
 pub const LEVEL_WIDTH: f32 = 1000.;
