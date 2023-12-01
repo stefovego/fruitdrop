@@ -4,7 +4,7 @@ use bevy_rapier2d::prelude::*;
 use crate::camera::MainCamera;
 
 
-pub const LEVEL_WIDTH: f32 = 1000.;
+pub const LEVEL_WIDTH: f32 = 700.;
 pub const LEVEL_HEIGHT: f32 = 700.;
 pub const WALL_THICKNESS: f32 = 5.;
 
@@ -44,7 +44,8 @@ fn spawn_walls(
         })
         .insert(Collider::cuboid(LEVEL_WIDTH / 2., WALL_THICKNESS))
         .insert(TransformBundle::from(Transform::from_xyz(0.0, -400.0, 0.0)))
-        .insert(Wall);
+        .insert(Wall)
+        .insert(Name::new("Bottom Wall"));
 
     // Spawn Left Wall
     commands
@@ -58,7 +59,8 @@ fn spawn_walls(
         })
         .insert(Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT / 2.))
         .insert(TransformBundle::from(Transform::from_xyz(-(LEVEL_WIDTH / 2. + WALL_THICKNESS), -55.0, 0.0)))
-        .insert(Wall);
+        .insert(Wall)
+        .insert(Name::new("Left Wall"));
 
     // Spawn Right Wall
     commands
@@ -72,6 +74,7 @@ fn spawn_walls(
         })
         .insert(Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT / 2.))
         .insert(TransformBundle::from(Transform::from_xyz(LEVEL_WIDTH / 2. + WALL_THICKNESS, -55.0, 0.0)))
-        .insert(Wall);
+        .insert(Wall)
+        .insert(Name::new("Right Wall"));
     }
 
