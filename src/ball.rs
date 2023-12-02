@@ -1,50 +1,58 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_rapier2d::prelude::*;
 use crate::dropper::{Dropper, LoadedBall};
-use crate::ondeck::{OnDeckBall};
+use crate::ondeck::OnDeckBall;
+use crate::score::PlayerScore;
 use rand::Rng;
 
 pub const DROP_TIMER_LIMIT: f32 =  0.5;
 pub const KING_BALL: BallType = BallType::XLarge;
 
 pub struct BallData {
-    pub size: f32,
     pub color: Color,
+    pub points: u32,
+    pub size: f32,
     pub upgraded: BallType
 }
 
 pub const XXXSMALL:BallData =  BallData {
-    size: 20.,
     color: Color::TOMATO,
+    points: 100,
+    size: 20.,
     upgraded: BallType::XXSmall
 };
 
 pub const XXSMALL:BallData =  BallData {
     size: 28.3,
+    points: 200,
     color: Color::BLUE,
     upgraded: BallType::XSmall
 };
 
 pub const XSMALL:BallData =  BallData {
     size: 40.,
+    points: 300,
     color: Color::YELLOW,
     upgraded: BallType::Small
 };
 
 pub const SMALL:BallData =  BallData {
     size: 56.7,
+    points: 300,
     color: Color::PINK,
     upgraded: BallType::Medium
     };
 
 pub const MEDIUM:BallData =  BallData {
     size: 80.,
+    points: 400,
     color: Color::ORANGE,
     upgraded: BallType::Large
 };
 
 pub const LARGE:BallData =  BallData {
     size: 113.1,
+    points: 500,
     color: Color::TEAL,
     upgraded: BallType::XLarge
 
@@ -52,6 +60,7 @@ pub const LARGE:BallData =  BallData {
 
 pub const XLARGE:BallData =  BallData {
     size: 160.,
+    points: 2000,
     color: Color::YELLOW_GREEN,
     upgraded: BallType::XXSmall
 
@@ -119,6 +128,7 @@ fn debug_collisions(
     mut collision_events: EventReader<CollisionEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    mut player_score: ResMut<PlayerScore>,
 ) {
     for collision_event in collision_events.read(){
         match collision_event {
@@ -134,6 +144,7 @@ fn debug_collisions(
                         if *ft != KING_BALL
                         {
                             let og_ball_type = get_ball_stats(*ft);
+                            player_score.value += og_ball_type.points;
                             let new_ball = get_ball_stats(og_ball_type.upgraded);
                             commands
                                 .spawn(MaterialMesh2dBundle {
@@ -157,11 +168,12 @@ fn debug_collisions(
                                 .insert(og_ball_type.upgraded)
                                 .insert(Name::new("Ball"))
                                 .insert(Ball); 
-                        }
-
+                        } else {
+                            player_score.value += get_ball_stats(KING_BALL).points;
                         }
                     }
                 }
+            }
 
             CollisionEvent::Stopped(first_entity, second_entity, event) => {
             }
@@ -175,7 +187,7 @@ fn spawn_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut dropper_query: Query<&mut Transform, With<Dropper>>,
+    dropper_query: Query<&Transform, With<Dropper>>,
     mut drop_timer_query: Query<(Entity, &mut DropTimer)>,
     keyboard_input: Res<Input<KeyCode>>,
     time: Res<Time>,
@@ -192,7 +204,7 @@ fn spawn_ball(
         }
     }
     
-    if let Ok(mut transform) = dropper_query.get_single_mut() {
+    if let Ok(transform) = dropper_query.get_single() {
         if keyboard_input.just_pressed(KeyCode::Space) {
             let ball_type = loadedball.balltype;
             loadedball.balltype = on_deck_ball.balltype;

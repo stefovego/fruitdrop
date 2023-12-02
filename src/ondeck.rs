@@ -15,8 +15,8 @@ pub struct OnDeckBallComponent;
 #[derive(Component)]
 pub struct OnDeck;
 
-pub const BOX_WIDTH: f32 = 100.;
-pub const BOX_HEIGHT: f32 = 100.;
+pub const BOX_WIDTH: f32 = 150.;
+pub const BOX_HEIGHT: f32 = 150.;
 pub const BOX_X: f32 = 650.;
 pub const BOX_Y: f32 = 250.;
 pub const BOX_THICKNESS: f32 = 4.;
@@ -37,6 +37,62 @@ fn spawn_deck(
     on_deck_ball: Res<OnDeckBall>
     ){
     // Spawn The Box Entity
+    commands.spawn(SpriteBundle{
+        sprite: Sprite { color: Color::ORANGE,
+            custom_size: Some(Vec2 {
+                x: BOX_WIDTH,
+                y: BOX_THICKNESS }), 
+            ..default()},
+        transform: Transform {
+            translation: Vec3 {
+                x: BOX_X,
+                y: BOX_Y + BOX_HEIGHT / 2., 
+                z: 0. }, 
+            ..default() },
+        ..default()
+    });
+    commands.spawn(SpriteBundle{
+        sprite: Sprite { color: Color::ORANGE,
+            custom_size: Some(Vec2 {
+                x: BOX_WIDTH,
+                y: BOX_THICKNESS }), 
+            ..default()},
+        transform: Transform {
+            translation: Vec3 {
+                x: BOX_X,
+                y: BOX_Y - BOX_HEIGHT / 2., 
+                z: 0. }, 
+            ..default() },
+        ..default()
+    });
+    commands.spawn(SpriteBundle{
+        sprite: Sprite { color: Color::ORANGE,
+            custom_size: Some(Vec2 {
+                x: BOX_THICKNESS,
+                y: BOX_HEIGHT}), 
+            ..default()},
+        transform: Transform {
+            translation: Vec3 {
+                x: BOX_X + BOX_WIDTH / 2.,
+                y: BOX_Y, 
+                z: 0. }, 
+            ..default() },
+        ..default()
+    });
+    commands.spawn(SpriteBundle{
+        sprite: Sprite { color: Color::ORANGE,
+            custom_size: Some(Vec2 {
+                x: BOX_THICKNESS,
+                y: BOX_HEIGHT}), 
+            ..default()},
+        transform: Transform {
+            translation: Vec3 {
+                x: BOX_X - BOX_WIDTH / 2.,
+                y: BOX_Y, 
+                z: 0. }, 
+            ..default() },
+        ..default()
+    });
     let on_deck_entity = commands
         .spawn(TransformBundle::from(Transform::from_xyz(650.0, 250.0, 0.0)))
         /*

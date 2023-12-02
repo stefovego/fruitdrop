@@ -19,6 +19,9 @@ use dropper::*;
 mod ondeck;
 use ondeck::*;
 
+mod score;
+use score::*;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -30,6 +33,7 @@ fn main() {
         .add_plugins(WallsPlugin)
         .add_plugins(OnDeckPlugin)
         .add_plugins(DropperPlugin)
+        .add_plugins(ScorePlugin)
         .run();
 }
 
