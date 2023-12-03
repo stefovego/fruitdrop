@@ -1,7 +1,4 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
-use bevy_rapier2d::prelude::*;
-use crate::dropper::Dropper;
-use rand::Rng;
+use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
 pub struct CameraPlugin;
@@ -15,16 +12,19 @@ impl Plugin for CameraPlugin {
     }
 }
 
-fn setup_graphics(mut commands: Commands){ 
+fn setup_graphics(mut commands: Commands) {
     //commands.spawn(Camera2dBundle::default());
-    println!("setup_graphics");
-    commands.spawn((Camera2dBundle {
-        projection: OrthographicProjection {
-            scaling_mode: ScalingMode::FixedVertical(1000.0),
-            near: -2.0,
+    commands.spawn((
+        Camera2dBundle {
+            projection: OrthographicProjection {
+                scaling_mode: ScalingMode::FixedVertical(1000.0),
+                near: -10.0,
+                far: 10.,
+                ..default()
+            },
+            //transform: Transform::from_xyz(1000.0, -1000.0, 0.0),
             ..default()
         },
-        //transform: Transform::from_xyz(1000.0, -1000.0, 0.0),
-        ..default()
-    }, MainCamera));
+        MainCamera,
+    ));
 }

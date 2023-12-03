@@ -1,8 +1,7 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle, window::PrimaryWindow};
+use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::camera::MainCamera;
-
+use crate::game_state::AppState;
 
 pub const LEVEL_WIDTH: f32 = 700.;
 pub const LEVEL_HEIGHT: f32 = 700.;
@@ -12,26 +11,21 @@ pub struct WallsPlugin;
 
 impl Plugin for WallsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, spawn_walls);
+        app.add_systems(OnEnter(AppState::InGame), spawn_walls)
+            .add_systems(OnExit(AppState::GameOver), tear_down);
     }
 }
 
 #[derive(Component)]
 struct Wall;
 
+fn tear_down(mut commands: Commands, wall_query: Query<Entity, With<Wall>>) {
+    for wall_entity in &wall_query {
+        commands.entity(wall_entity).despawn_recursive();
+    }
+}
 
-fn spawn_walls(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut projection_query: Query<&mut OrthographicProjection, With<MainCamera>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    ) {
-    
-    let projection = projection_query.single_mut();
-
-    let screen_width = projection.area.max.x - projection.area.min.x;
-    let screen_height = projection.area.max.y - projection.area.min.y;
-
+fn spawn_walls(mut commands: Commands) {
     // Spawn Bottom Wall
     commands
         .spawn(SpriteBundle {
@@ -58,7 +52,11 @@ fn spawn_walls(
             ..default()
         })
         .insert(Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT / 2.))
-        .insert(TransformBundle::from(Transform::from_xyz(-(LEVEL_WIDTH / 2. + WALL_THICKNESS), -55.0, 0.0)))
+        .insert(TransformBundle::from(Transform::from_xyz(
+            -(LEVEL_WIDTH / 2. + WALL_THICKNESS),
+            -55.0,
+            0.0,
+        )))
         .insert(Wall)
         .insert(Name::new("Left Wall"));
 
@@ -73,8 +71,11 @@ fn spawn_walls(
             ..default()
         })
         .insert(Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT / 2.))
-        .insert(TransformBundle::from(Transform::from_xyz(LEVEL_WIDTH / 2. + WALL_THICKNESS, -55.0, 0.0)))
+        .insert(TransformBundle::from(Transform::from_xyz(
+            LEVEL_WIDTH / 2. + WALL_THICKNESS,
+            -55.0,
+            0.0,
+        )))
         .insert(Wall)
         .insert(Name::new("Right Wall"));
-    }
-
+}
