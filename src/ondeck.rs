@@ -30,10 +30,10 @@ impl Plugin for OnDeckPlugin {
         app.insert_resource(OnDeckBall {
             balltype: random_ball(),
         })
-            .add_systems(OnEnter(AppState::InGame), spawn_deck)
-            .add_systems(Update, on_deck_ball_change)
-            .add_systems(OnExit(AppState::GameOver), tear_down_ball)
-            .add_systems(OnExit(AppState::GameOver), tear_down_box);
+        .add_systems(OnEnter(AppState::InGame), spawn_deck)
+        .add_systems(Update, on_deck_ball_change)
+        .add_systems(OnExit(AppState::GameOver), tear_down_ball)
+        .add_systems(OnExit(AppState::GameOver), tear_down_box);
     }
 }
 
@@ -57,84 +57,96 @@ fn spawn_deck(
 ) {
     on_deck_ball.balltype = random_ball();
     // Spawn The Box Entity
-    commands.spawn((SpriteBundle {
-        sprite: Sprite {
-            color: Color::ORANGE,
-            custom_size: Some(Vec2 {
-                x: BOX_WIDTH,
-                y: BOX_THICKNESS,
-            }),
-            ..default()
-        },
-        transform: Transform {
-            translation: Vec3 {
-                x: BOX_X,
-                y: BOX_Y + BOX_HEIGHT / 2.,
-                z: 0.,
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::ORANGE,
+                custom_size: Some(Vec2 {
+                    x: BOX_WIDTH,
+                    y: BOX_THICKNESS,
+                }),
+                ..default()
+            },
+            transform: Transform {
+                translation: Vec3 {
+                    x: BOX_X,
+                    y: BOX_Y + BOX_HEIGHT / 2.,
+                    z: 0.,
+                },
+                ..default()
             },
             ..default()
         },
-        ..default()
-    }, OnDeckBox));
-    commands.spawn((SpriteBundle {
-        sprite: Sprite {
-            color: Color::ORANGE,
-            custom_size: Some(Vec2 {
-                x: BOX_WIDTH,
-                y: BOX_THICKNESS,
-            }),
-            ..default()
-        },
-        transform: Transform {
-            translation: Vec3 {
-                x: BOX_X,
-                y: BOX_Y - BOX_HEIGHT / 2.,
-                z: 0.,
+        OnDeckBox,
+    ));
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::ORANGE,
+                custom_size: Some(Vec2 {
+                    x: BOX_WIDTH,
+                    y: BOX_THICKNESS,
+                }),
+                ..default()
+            },
+            transform: Transform {
+                translation: Vec3 {
+                    x: BOX_X,
+                    y: BOX_Y - BOX_HEIGHT / 2.,
+                    z: 0.,
+                },
+                ..default()
             },
             ..default()
         },
-        ..default()
-    }, OnDeckBox));
+        OnDeckBox,
+    ));
 
-    commands.spawn((SpriteBundle {
-        sprite: Sprite {
-            color: Color::ORANGE,
-            custom_size: Some(Vec2 {
-                x: BOX_THICKNESS,
-                y: BOX_HEIGHT,
-            }),
-            ..default()
-        },
-        transform: Transform {
-            translation: Vec3 {
-                x: BOX_X + BOX_WIDTH / 2.,
-                y: BOX_Y,
-                z: 0.,
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::ORANGE,
+                custom_size: Some(Vec2 {
+                    x: BOX_THICKNESS,
+                    y: BOX_HEIGHT,
+                }),
+                ..default()
+            },
+            transform: Transform {
+                translation: Vec3 {
+                    x: BOX_X + BOX_WIDTH / 2.,
+                    y: BOX_Y,
+                    z: 0.,
+                },
+                ..default()
             },
             ..default()
         },
-        ..default()
-    }, OnDeckBox));
+        OnDeckBox,
+    ));
 
-    commands.spawn((SpriteBundle {
-        sprite: Sprite {
-            color: Color::ORANGE,
-            custom_size: Some(Vec2 {
-                x: BOX_THICKNESS,
-                y: BOX_HEIGHT,
-            }),
-            ..default()
-        },
-        transform: Transform {
-            translation: Vec3 {
-                x: BOX_X - BOX_WIDTH / 2.,
-                y: BOX_Y,
-                z: 0.,
+    commands.spawn((
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::ORANGE,
+                custom_size: Some(Vec2 {
+                    x: BOX_THICKNESS,
+                    y: BOX_HEIGHT,
+                }),
+                ..default()
+            },
+            transform: Transform {
+                translation: Vec3 {
+                    x: BOX_X - BOX_WIDTH / 2.,
+                    y: BOX_Y,
+                    z: 0.,
+                },
+                ..default()
             },
             ..default()
         },
-        ..default()
-    }, OnDeckBox));
+        OnDeckBox,
+    ));
 
     let on_deck_entity = commands
         .spawn(TransformBundle::from(Transform::from_xyz(

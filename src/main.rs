@@ -32,6 +32,8 @@ use game_state::*;
 mod gameover;
 use gameover::*;
 
+mod bundles;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)

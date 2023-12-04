@@ -1,3 +1,5 @@
+use crate::bundles;
+use crate::bundles::ball::new;
 use crate::dropper::{Dropper, LoadedBall};
 use crate::game_state::AppState;
 use crate::ondeck::OnDeckBall;
@@ -72,6 +74,11 @@ struct DropTimer {
     timer: Timer,
 }
 
+#[derive(Component)]
+struct GrowTimer {
+    timer: Timer,
+}
+
 #[derive(Component, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum BallType {
     XXXSmall,
@@ -86,7 +93,10 @@ pub enum BallType {
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, spawn_ball.run_if(in_state(AppState::InGame)))
-            .add_systems(Update, handle_collisions)
+            .add_systems(
+                Update,
+                (handle_collisions, apply_deferred, grow_balls).chain(),
+            )
             .add_systems(OnExit(AppState::GameOver), tear_down);
     }
 }
@@ -126,6 +136,24 @@ fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Ball>>) {
     }
 }
 
+fn grow_balls(
+    mut commands: Commands,
+    mut grow_timer_query: Query<(Entity, &mut Transform, &mut GrowTimer), With<GrowTimer>>,
+    time: Res<Time>,
+) {
+    for (entity, mut transform, mut grow_timer) in &mut grow_timer_query {
+        grow_timer.timer.tick(time.delta());
+        if grow_timer.timer.just_finished() {
+            transform.scale = Vec3::new(1., 1., 1.0);
+            commands.entity(entity).remove::<GrowTimer>();
+        } else {
+            let grow_percent = grow_timer.timer.percent() / 2. + 0.5;
+            info!("Growing {:?}", grow_percent);
+            transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
+        }
+    }
+}
+
 fn handle_collisions(
     mut commands: Commands,
     ball_query: Query<(Entity, &BallType, &Transform), With<Ball>>,
@@ -135,6 +163,7 @@ fn handle_collisions(
     mut player_score: ResMut<PlayerScore>,
 ) {
     for collision_event in collision_events.read() {
+        info!("Count: {:?}", ball_query.iter().count());
         match collision_event {
             CollisionEvent::Started(first_entity, second_entity, _) => {
                 //let world = world::World::new();
@@ -151,33 +180,20 @@ fn handle_collisions(
                             let og_ball_type = get_ball_stats(*ft);
                             player_score.value += og_ball_type.points;
                             let new_ball = get_ball_stats(og_ball_type.upgraded);
-                            commands
-                                .spawn(MaterialMesh2dBundle {
-                                    mesh: meshes
-                                        .add(shape::Circle::new(new_ball.size).into())
-                                        .into(),
-                                    material: materials.add(ColorMaterial::from(new_ball.color)),
+                            let mesh_material = MaterialMesh2dBundle {
+                                mesh: meshes.add(shape::Circle::new(new_ball.size).into()).into(),
+                                material: materials.add(ColorMaterial::from(new_ball.color)),
+                                transform: Transform {
+                                    translation: third_ball_translation,
                                     ..default()
-                                })
-                                .insert(RigidBody::Dynamic)
-                                .insert(Velocity::zero())
-                                .insert(GravityScale(4.0))
-                                .insert(Collider::ball(new_ball.size))
-                                .insert(Restitution::coefficient(0.7))
-                                .insert(TransformBundle {
-                                    local: Transform {
-                                        translation: third_ball_translation,
-                                        ..Default::default()
-                                    },
-                                    ..Default::default()
-                                })
-                                .insert(DropTimer {
-                                    timer: Timer::from_seconds(DROP_TIMER_LIMIT, TimerMode::Once),
-                                })
-                                .insert(ActiveEvents::COLLISION_EVENTS)
-                                .insert(og_ball_type.upgraded)
-                                .insert(Name::new("Ball"))
-                                .insert(Ball);
+                                },
+                                ..default()
+                            };
+                            commands
+                                .spawn(bundles::ball::new(mesh_material, og_ball_type.upgraded))
+                                .insert(GrowTimer {
+                                    timer: Timer::from_seconds(0.25, TimerMode::Once),
+                                });
                         } else {
                             player_score.value += get_ball_stats(KING_BALL).points;
                         }
@@ -211,33 +227,27 @@ fn spawn_ball(
 
     if let Ok(transform) = dropper_query.get_single() {
         if keyboard_input.just_pressed(KeyCode::Space) {
-            let ball_type = loadedball.balltype;
-            loadedball.balltype = on_deck_ball.balltype;
-            on_deck_ball.balltype = random_ball();
-            let ball = get_ball_stats(ball_type);
-            commands
-                .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(shape::Circle::new(ball.size).into()).into(),
-                    material: materials.add(ColorMaterial::from(ball.color)),
+            let balldata = get_ball_stats(loadedball.balltype);
+            let mesh_material = MaterialMesh2dBundle {
+                mesh: meshes.add(shape::Circle::new(balldata.size).into()).into(),
+                material: materials.add(ColorMaterial::from(balldata.color)),
+                transform: Transform {
+                    translation: Vec3::new(
+                        transform.translation.x,
+                        transform.translation.y - 50.0,
+                        1.0,
+                    ),
                     ..default()
-                })
-                .insert(RigidBody::Dynamic)
-                .insert(Velocity::zero())
-                .insert(GravityScale(4.0))
-                .insert(Collider::ball(ball.size))
-                .insert(Restitution::coefficient(0.7))
-                .insert(TransformBundle::from(Transform::from_xyz(
-                    transform.translation.x,
-                    transform.translation.y - 50.0,
-                    1.0,
-                )))
+                },
+                ..default()
+            };
+            commands
+                .spawn(bundles::ball::new(mesh_material, loadedball.balltype))
                 .insert(DropTimer {
                     timer: Timer::from_seconds(DROP_TIMER_LIMIT, TimerMode::Once),
-                })
-                .insert(ActiveEvents::COLLISION_EVENTS)
-                .insert(ball_type)
-                .insert(Ball)
-                .insert(Name::new("Ball"));
+                });
+            loadedball.balltype = on_deck_ball.balltype;
+            on_deck_ball.balltype = random_ball();
         }
     }
 }

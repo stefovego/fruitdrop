@@ -20,9 +20,9 @@ impl Plugin for DropperPlugin {
             (dropper_movement, restrict_dropper_movement)
                 .chain()
                 .run_if(in_state(AppState::InGame)),
-            )
-            .add_systems(Update, loaded_ball_change)
-            .add_systems(OnExit(AppState::GameOver), tear_down);
+        )
+        .add_systems(Update, loaded_ball_change)
+        .add_systems(OnExit(AppState::GameOver), tear_down);
     }
 }
 
@@ -40,7 +40,6 @@ fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Dropper>>) {
     for ball_entity in &ball_query {
         commands.entity(ball_entity).despawn_recursive();
     }
-
 }
 fn loaded_ball_change(
     mut commands: Commands,
