@@ -37,7 +37,7 @@ mod bundles;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(300.0))
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(40.0))
         //.add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
         .add_state::<AppState>()

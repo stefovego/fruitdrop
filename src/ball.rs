@@ -77,6 +77,8 @@ struct DropTimer {
 #[derive(Component)]
 struct GrowTimer {
     timer: Timer,
+    old_color: Color,
+    new_color: Color,
 }
 
 #[derive(Component, Debug, PartialEq, Eq, Clone, Copy)]
@@ -138,17 +140,29 @@ fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Ball>>) {
 
 fn grow_balls(
     mut commands: Commands,
-    mut grow_timer_query: Query<(Entity, &mut Transform, &mut GrowTimer), With<GrowTimer>>,
+    mut grow_timer_query: Query<(Entity, &mut Transform, &mut GrowTimer, &Handle<ColorMaterial>), With<GrowTimer>>,
     time: Res<Time>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    for (entity, mut transform, mut grow_timer) in &mut grow_timer_query {
+    for (entity, mut transform, mut grow_timer, mut handle_color) in &mut grow_timer_query {
         grow_timer.timer.tick(time.delta());
         if grow_timer.timer.just_finished() {
             transform.scale = Vec3::new(1., 1., 1.0);
+            commands.entity(entity).insert(materials.add(ColorMaterial::from(grow_timer.new_color)));
             commands.entity(entity).remove::<GrowTimer>();
         } else {
+            let mut current_color = &mut materials.get_mut(handle_color).unwrap().color;
+            //TODO: This needs a clean up
             let grow_percent = grow_timer.timer.percent() / 2. + 0.5;
-            info!("Growing {:?}", grow_percent);
+            let o = grow_timer.old_color.as_linear_rgba_f32();
+            let old = Vec4::new(o[0], o[1], o[2], o[3]);
+
+            let n = grow_timer.new_color.as_linear_rgba_f32();
+            let new = Vec4::new(n[0], n[1], n[2], n[3]);
+            
+            let m = old.lerp(new, grow_timer.timer.percent());  
+
+            commands.entity(entity).insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
             transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
         }
     }
@@ -189,10 +203,13 @@ fn handle_collisions(
                                 },
                                 ..default()
                             };
+                            info!("{:?}", og_ball_type.color);
                             commands
                                 .spawn(bundles::ball::new(mesh_material, og_ball_type.upgraded))
                                 .insert(GrowTimer {
                                     timer: Timer::from_seconds(0.25, TimerMode::Once),
+                                    old_color: og_ball_type.color,
+                                    new_color: new_ball.color,
                                 });
                         } else {
                             player_score.value += get_ball_stats(KING_BALL).points;

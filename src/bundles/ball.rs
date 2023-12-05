@@ -88,9 +88,6 @@ pub fn get_ball_stats(ball_type: BallType) -> BallData {
 }
 
 pub fn new(
-    // mut meshes: &ResMut<Assets<Mesh>>,
-    // mut materials: &ResMut<Assets<ColorMaterial>>,
-    //balldata: BallData,
     materialmesh: MaterialMesh2dBundle<ColorMaterial>,
     ball_type: BallType,
 ) -> BallBundle {
@@ -100,9 +97,9 @@ pub fn new(
         material_mesh_2d: materialmesh,
         rigid_body: RigidBody::Dynamic,
         velocity: Velocity::zero(),
-        gravity_scale: GravityScale(4.0),
+        gravity_scale: GravityScale(20.0),
         collider: Collider::ball(balldata.size),
-        restitution: Restitution::coefficient(0.7),
+        restitution: Restitution::coefficient(0.4),
         active_events: ActiveEvents::COLLISION_EVENTS,
         balltype: ball_type,
         name: Name::new("Ball"),

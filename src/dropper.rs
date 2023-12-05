@@ -126,9 +126,11 @@ fn dropper_movement(
     }
 }
 
-fn restrict_dropper_movement(mut dropper_query: Query<&mut Transform, With<Dropper>>) {
-    let min_x: f32 = -(LEVEL_WIDTH + WALL_THICKNESS - DROPPER_WIDTH) / 2.;
-    let max_x: f32 = (LEVEL_WIDTH + WALL_THICKNESS - DROPPER_WIDTH) / 2.;
+fn restrict_dropper_movement(mut dropper_query: Query<&mut Transform, With<Dropper>>, loaded_ball: Res<LoadedBall>) {
+
+    let min_x: f32 = -LEVEL_WIDTH / 2. + get_ball_stats(loaded_ball.balltype).size;
+    //let min_x: f32 = -(LEVEL_WIDTH + WALL_THICKNESS ) / 2. + get_ball_stats(loaded_ball.balltype).size;
+    let max_x: f32 = LEVEL_WIDTH / 2. - get_ball_stats(loaded_ball.balltype).size;
     if let Ok(mut transform) = dropper_query.get_single_mut() {
         if transform.translation.x < min_x {
             transform.translation.x = min_x;
