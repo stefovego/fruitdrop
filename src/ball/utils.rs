@@ -1,23 +1,7 @@
-use crate::ball::{Ball, BallType};
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
-use bevy_rapier2d::prelude::*;
+use bevy::prelude::*;
+use rand::Rng;
 
-// pub const KING_BALL: BallType = BallType::XLarge;
-
-#[derive(Bundle)]
-pub struct BallBundle {
-    material_mesh_2d: MaterialMesh2dBundle<ColorMaterial>,
-    rigid_body: RigidBody,
-    velocity: Velocity,
-    gravity_scale: GravityScale,
-    collider: Collider,
-    restitution: Restitution,
-    //transform: TransformBundle,
-    active_events: ActiveEvents,
-    balltype: BallType,
-    name: Name,
-    ball: Ball,
-}
+use crate::ball::components::BallType;
 
 pub struct BallData {
     pub color: Color,
@@ -71,9 +55,30 @@ pub const LARGE: BallData = BallData {
 pub const XLARGE: BallData = BallData {
     size: 160.,
     points: 2000,
+    color: Color::INDIGO,
+    upgraded: BallType::XXLarge,
+};
+
+pub const XXLARGE: BallData = BallData {
+    size: 226.,
+    points: 4000,
     color: Color::YELLOW_GREEN,
     upgraded: BallType::XXSmall,
 };
+
+pub fn random_ball() -> BallType {
+    let mut rng = rand::thread_rng();
+
+    match rng.gen_range(0..3) {
+        0 => BallType::XXXSmall,
+        1 => BallType::XXSmall,
+        2 => BallType::XSmall,
+        3 => BallType::Small,
+        4 => BallType::Medium,
+        5 => BallType::Large,
+        _ => unreachable!(),
+    }
+}
 
 pub fn get_ball_stats(ball_type: BallType) -> BallData {
     match ball_type {
@@ -84,25 +89,6 @@ pub fn get_ball_stats(ball_type: BallType) -> BallData {
         BallType::Medium => MEDIUM,
         BallType::Large => LARGE,
         BallType::XLarge => XLARGE,
-    }
-}
-
-pub fn new(
-    materialmesh: MaterialMesh2dBundle<ColorMaterial>,
-    ball_type: BallType,
-) -> BallBundle {
-    let balldata = get_ball_stats(ball_type);
-
-    BallBundle {
-        material_mesh_2d: materialmesh,
-        rigid_body: RigidBody::Dynamic,
-        velocity: Velocity::zero(),
-        gravity_scale: GravityScale(20.0),
-        collider: Collider::ball(balldata.size),
-        restitution: Restitution::coefficient(0.4),
-        active_events: ActiveEvents::COLLISION_EVENTS,
-        balltype: ball_type,
-        name: Name::new("Ball"),
-        ball: Ball {},
+        BallType::XXLarge => XXLARGE,
     }
 }

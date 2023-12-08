@@ -2,9 +2,6 @@ use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
 
-mod ball;
-use ball::*;
-
 mod camera;
 use camera::*;
 
@@ -32,8 +29,8 @@ use game_state::*;
 mod gameover;
 use gameover::*;
 
-mod bundles;
-
+mod ball;
+use crate::ball::plugin::BallPlugin;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)

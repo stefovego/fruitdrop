@@ -1,6 +1,8 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
-use crate::ball::{get_ball_stats, random_ball, BallType};
+use crate::ball::utils::{get_ball_stats, random_ball};
+
+use crate::ball::components::BallType;
 use crate::game_state::AppState;
 
 pub struct OnDeckPlugin;
