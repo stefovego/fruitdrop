@@ -1,11 +1,13 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+// use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 
 use crate::game_state::AppState;
+use crate::physics::Layer;
 
 pub const LEVEL_WIDTH: f32 = 700.;
 pub const LEVEL_HEIGHT: f32 = 700.;
-pub const WALL_THICKNESS: f32 = 5.;
+pub const WALL_THICKNESS: f32 = 40.;
 
 pub struct WallsPlugin;
 
@@ -27,55 +29,56 @@ fn tear_down(mut commands: Commands, wall_query: Query<Entity, With<Wall>>) {
 
 fn spawn_walls(mut commands: Commands) {
     // Spawn Bottom Wall
-    commands
-        .spawn(SpriteBundle {
+    commands.spawn((
+        SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
-                custom_size: Some(Vec2::new(LEVEL_WIDTH, WALL_THICKNESS * 2.0)),
+                color: Color::GRAY,
+                custom_size: Some(Vec2::new(LEVEL_WIDTH, WALL_THICKNESS)),
                 ..default()
             },
+            transform: Transform::from_xyz(0.0, -405.0, 0.0),
             ..default()
-        })
-        .insert(Collider::cuboid(LEVEL_WIDTH / 2., WALL_THICKNESS))
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, -400.0, 0.0)))
-        .insert(Wall)
-        .insert(Name::new("Bottom Wall"));
+        },
+        RigidBody::Static,
+        Collider::cuboid(LEVEL_WIDTH, WALL_THICKNESS),
+        CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
+        Wall,
+        Name::new("Bottom Wall"),
+    ));
 
     // Spawn Left Wall
-    commands
-        .spawn(SpriteBundle {
+    commands.spawn((
+        SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
-                custom_size: Some(Vec2::new(WALL_THICKNESS * 2.0, LEVEL_HEIGHT)),
+                color: Color::GRAY,
+                custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
                 ..default()
             },
+            transform: Transform::from_xyz(-(LEVEL_WIDTH / 2. + WALL_THICKNESS / 2.), -55.0, 0.0),
             ..default()
-        })
-        .insert(Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT / 2.))
-        .insert(TransformBundle::from(Transform::from_xyz(
-            -(LEVEL_WIDTH / 2. + WALL_THICKNESS),
-            -55.0,
-            0.0,
-        )))
-        .insert(Wall)
-        .insert(Name::new("Left Wall"));
+        },
+        RigidBody::Static,
+        Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
+        CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
+        Wall,
+        Name::new("Left Wall"),
+    ));
 
     // Spawn Right Wall
-    commands
-        .spawn(SpriteBundle {
+    commands.spawn((
+        SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
-                custom_size: Some(Vec2::new(WALL_THICKNESS * 2.0, LEVEL_HEIGHT)),
+                color: Color::GRAY,
+                custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
                 ..default()
             },
+            transform: Transform::from_xyz(LEVEL_WIDTH / 2. + WALL_THICKNESS / 2., -55.0, 0.0),
             ..default()
-        })
-        .insert(Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT / 2.))
-        .insert(TransformBundle::from(Transform::from_xyz(
-            LEVEL_WIDTH / 2. + WALL_THICKNESS,
-            -55.0,
-            0.0,
-        )))
-        .insert(Wall)
-        .insert(Name::new("Right Wall"));
+        },
+        RigidBody::Static,
+        Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
+        CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
+        Wall,
+        Name::new("Right Wall"),
+    ));
 }

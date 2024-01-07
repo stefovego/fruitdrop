@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 
 use crate::ball::components::{Ball, FreshBall};
 use crate::game_state::AppState;
 
-pub const WIDTH: f32 = 500.;
+pub const WIDTH: f32 = 700.;
 pub const HEIGHT: f32 = 50.;
 pub const BORDER_HEIGHT: f32 = 350.;
 pub const DANGER_ZONE: f32 = 300.;
@@ -38,7 +38,6 @@ fn tear_down(mut commands: Commands, loser_box_query: Query<Entity, With<LoserBo
 fn danger_warning(
     mut commands: Commands,
     ball_query: Query<&Transform, (With<Ball>, Without<FreshBall>)>,
-    // mut warning_query: Query<(Entity, &DangerWarning), With<DangerWarning>>,
     mut warning_query: Query<(Entity, &Handle<ColorMaterial>, &DangerWarning), With<DangerWarning>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
@@ -46,7 +45,6 @@ fn danger_warning(
     let mut largest_y: f32 = -500.;
 
     for (ball_transform) in &ball_query {
-        // if ball_velocity.linvel.y >= 0. && ball_transform.translation.y > largest_y {
         if ball_transform.translation.y > largest_y {
             largest_y = ball_transform.translation.y;
         }
@@ -66,14 +64,16 @@ fn danger_warning(
 }
 
 fn handle_collisions(
-    rapier_context: Res<RapierContext>,
+    spatial_query: SpatialQuery,
     ball_query: Query<Entity, (With<Ball>, Without<FreshBall>)>,
-    loser_box_query: Query<Entity, With<LoserBox>>,
+    loser_box_query: Query<(Entity, &Collider, &Transform), With<LoserBox>>,
     mut next_state: ResMut<NextState<AppState>>,
 ) {
-    for loser_box_entity in &loser_box_query {
-        for ball_entity in &ball_query {
-            if rapier_context.intersection_pair(loser_box_entity, ball_entity) == Some(true) {
+    for (loser_box_entity, loser_box_colllider, loser_box_transform) in &loser_box_query {
+        let aabb = loser_box_colllider.compute_aabb(loser_box_transform.translation.xy(), 0.);
+        let aabb_intersections = spatial_query.aabb_intersections_with_aabb(aabb);
+        for entity in aabb_intersections.iter() {
+            if ball_query.contains(*entity) {
                 next_state.set(AppState::GameOver);
             }
         }
@@ -111,5 +111,5 @@ fn setup(
             0.0,
         )))
         .insert(DangerWarning { color: Color::RED })
-    .insert(Name::new("danger_warning"));
+        .insert(Name::new("danger_warning"));
 }

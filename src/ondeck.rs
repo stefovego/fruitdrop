@@ -3,9 +3,8 @@ use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use crate::ball::utils::{get_ball_stats, random_ball};
 
 use crate::ball::components::BallType;
+use crate::ball::resources::BallScaler;
 use crate::game_state::AppState;
-
-pub struct OnDeckPlugin;
 
 #[derive(Resource)]
 pub struct OnDeckBall {
@@ -26,6 +25,8 @@ pub const BOX_HEIGHT: f32 = 150.;
 pub const BOX_X: f32 = 650.;
 pub const BOX_Y: f32 = 250.;
 pub const BOX_THICKNESS: f32 = 4.;
+
+pub struct OnDeckPlugin;
 
 impl Plugin for OnDeckPlugin {
     fn build(&self, app: &mut App) {
@@ -56,6 +57,7 @@ fn spawn_deck(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut on_deck_ball: ResMut<OnDeckBall>,
+    ball_scaler: Res<BallScaler>,
 ) {
     on_deck_ball.balltype = random_ball();
     // Spawn The Box Entity
@@ -163,9 +165,10 @@ fn spawn_deck(
         .id();
 
     let ball = get_ball_stats(on_deck_ball.balltype);
+    let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let on_deck_ball_entity = commands
         .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(ball.size).into()).into(),
+            mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
             material: materials.add(ColorMaterial::from(ball.color)),
             ..default()
         })
@@ -184,6 +187,7 @@ fn on_deck_ball_change(
     mut on_deck_ball_query: Query<(&Parent, Entity), With<OnDeckBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    ball_scaler: Res<BallScaler>,
 ) {
     if on_deck_ball.is_changed() {
         if let Ok((parent, child)) = on_deck_ball_query.get_single_mut() {
@@ -191,9 +195,10 @@ fn on_deck_ball_change(
             commands.entity(child).despawn();
 
             let ball = get_ball_stats(on_deck_ball.balltype);
+            let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(shape::Circle::new(ball.size).into()).into(),
+                    mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
                     material: materials.add(ColorMaterial::from(ball.color)),
                     ..default()
                 })

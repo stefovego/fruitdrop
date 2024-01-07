@@ -4,6 +4,9 @@ use bevy::prelude::*;
 pub struct Ball;
 
 #[derive(Component)]
+pub struct Seed;
+
+#[derive(Component)]
 pub struct FreshBall;
 
 #[derive(Component, Reflect)]
@@ -15,6 +18,7 @@ pub struct DropTimer {
 pub struct GrowTimer {
     pub timer: Timer,
     pub old_color: Color,
+    pub initial_multiplier: f32,
     pub new_color: Color,
 }
 

@@ -1,18 +1,22 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
-use crate::ball::components::BallType;
+use crate::dropper::components::*;
+use crate::dropper::resources::*;
+
+use crate::ball::resources::BallScaler;
 use crate::ball::utils::{get_ball_stats, random_ball};
 use crate::game_state::AppState;
 use crate::walls::{LEVEL_WIDTH, WALL_THICKNESS};
 
 pub struct DropperPlugin;
-pub const DROPPER_SPEED: f32 = 500.0;
-pub const DROPPER_WIDTH: f32 = 100.;
-
 impl Plugin for DropperPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(LoadedBall {
             balltype: random_ball(),
+        })
+        .insert_resource(DropperStats {
+            speed: 500.,
+            delay_time: 0.5,
         })
         .add_systems(OnEnter(AppState::InGame), spawn_dropper)
         .add_systems(
@@ -26,27 +30,19 @@ impl Plugin for DropperPlugin {
     }
 }
 
-#[derive(Resource)]
-pub struct LoadedBall {
-    pub balltype: BallType,
-}
-#[derive(Component)]
-pub struct LoadedBallComponent;
-
-#[derive(Component)]
-pub struct Dropper;
-
 fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Dropper>>) {
     for ball_entity in &ball_query {
         commands.entity(ball_entity).despawn_recursive();
     }
 }
+
 fn loaded_ball_change(
     mut commands: Commands,
     loaded_ball: Res<LoadedBall>,
     mut load_ball_query: Query<(&Parent, Entity), With<LoadedBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    ball_scaler: Res<BallScaler>,
 ) {
     if loaded_ball.is_changed() {
         if let Ok((parent, child)) = load_ball_query.get_single_mut() {
@@ -54,9 +50,10 @@ fn loaded_ball_change(
             commands.entity(child).despawn();
 
             let ball = get_ball_stats(loaded_ball.balltype);
+            let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(shape::Circle::new(ball.size).into()).into(),
+                    mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
                     material: materials.add(ColorMaterial::from(ball.color)),
                     ..default()
                 })
@@ -73,6 +70,7 @@ fn spawn_dropper(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut loaded_ball: ResMut<LoadedBall>,
+    ball_scaler: Res<BallScaler>,
 ) {
     loaded_ball.balltype = random_ball();
 
@@ -89,9 +87,10 @@ fn spawn_dropper(
         .id();
 
     let ball = get_ball_stats(loaded_ball.balltype);
+    let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let loadball_entity = commands
         .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(ball.size).into()).into(),
+            mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
             material: materials.add(ColorMaterial::from(ball.color)),
             ..default()
         })
@@ -106,6 +105,7 @@ fn dropper_movement(
     keyboard_input: Res<Input<KeyCode>>,
     mut dropper_query: Query<&mut Transform, With<Dropper>>,
     time: Res<Time>,
+    dropper_stats: Res<DropperStats>,
 ) {
     if let Ok(mut transform) = dropper_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
@@ -122,23 +122,26 @@ fn dropper_movement(
             direction = direction.normalize();
         }
 
-        transform.translation += direction * DROPPER_SPEED * time.delta_seconds();
+        transform.translation += direction * dropper_stats.speed * time.delta_seconds();
     }
 }
 
 fn restrict_dropper_movement(
     mut dropper_query: Query<&mut Transform, With<Dropper>>,
     loaded_ball: Res<LoadedBall>,
+    ball_scaler: Res<BallScaler>,
 ) {
-    let min_x: f32 = -LEVEL_WIDTH / 2. + get_ball_stats(loaded_ball.balltype).size;
+    let ball = get_ball_stats(loaded_ball.balltype);
+    let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
+    let min_x: f32 = -LEVEL_WIDTH / 2. + ball_size + 5.;
     //let min_x: f32 = -(LEVEL_WIDTH + WALL_THICKNESS ) / 2. + get_ball_stats(loaded_ball.balltype).size;
-    let max_x: f32 = LEVEL_WIDTH / 2. - get_ball_stats(loaded_ball.balltype).size;
+    let max_x: f32 = LEVEL_WIDTH / 2. - ball_size - 5.;
     if let Ok(mut transform) = dropper_query.get_single_mut() {
         if transform.translation.x < min_x {
-            transform.translation.x =  min_x +2.;
+            transform.translation.x = min_x;
         }
         if transform.translation.x > max_x {
-            transform.translation.x = max_x - 2.;
+            transform.translation.x = max_x;
         }
     }
 }

@@ -6,61 +6,61 @@ use crate::ball::components::BallType;
 pub struct BallData {
     pub color: Color,
     pub points: u32,
-    pub size: f32,
+    pub level: f32,
     pub upgraded: BallType,
 }
 
 pub const XXXSMALL: BallData = BallData {
+    level: 1.,
     color: Color::TOMATO,
     points: 100,
-    size: 20.,
     upgraded: BallType::XXSmall,
 };
 
 pub const XXSMALL: BallData = BallData {
-    size: 28.3,
+    level: 2.,
     points: 200,
     color: Color::BLUE,
     upgraded: BallType::XSmall,
 };
 
 pub const XSMALL: BallData = BallData {
-    size: 40.,
+    level: 3.,
     points: 300,
     color: Color::YELLOW,
     upgraded: BallType::Small,
 };
 
 pub const SMALL: BallData = BallData {
-    size: 56.7,
+    level: 4.,
     points: 300,
     color: Color::PINK,
     upgraded: BallType::Medium,
 };
 
 pub const MEDIUM: BallData = BallData {
-    size: 80.,
+    level: 5.,
     points: 400,
     color: Color::ORANGE,
     upgraded: BallType::Large,
 };
 
 pub const LARGE: BallData = BallData {
-    size: 113.1,
+    level: 6.,
     points: 500,
     color: Color::TEAL,
     upgraded: BallType::XLarge,
 };
 
 pub const XLARGE: BallData = BallData {
-    size: 160.,
+    level: 7.,
     points: 2000,
     color: Color::INDIGO,
     upgraded: BallType::XXLarge,
 };
 
 pub const XXLARGE: BallData = BallData {
-    size: 226.,
+    level: 8.,
     points: 4000,
     color: Color::YELLOW_GREEN,
     upgraded: BallType::XXSmall,
