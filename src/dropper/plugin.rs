@@ -1,4 +1,5 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use leafwing_input_manager::prelude::*;
 
 use crate::dropper::components::*;
 use crate::dropper::resources::*;
@@ -6,6 +7,7 @@ use crate::dropper::resources::*;
 use crate::ball::resources::BallScaler;
 use crate::ball::utils::{get_ball_stats, random_ball};
 use crate::game_state::AppState;
+use crate::handle_input::Action;
 use crate::walls::{LEVEL_WIDTH, WALL_THICKNESS};
 
 pub struct DropperPlugin;
@@ -21,7 +23,7 @@ impl Plugin for DropperPlugin {
         .add_systems(OnEnter(AppState::InGame), spawn_dropper)
         .add_systems(
             Update,
-            (dropper_movement, restrict_dropper_movement)
+            (dropper_movement, mouse_system, restrict_dropper_movement)
                 .chain()
                 .run_if(in_state(AppState::InGame)),
         )
@@ -102,20 +104,20 @@ fn spawn_dropper(
 }
 
 fn dropper_movement(
-    keyboard_input: Res<Input<KeyCode>>,
     mut dropper_query: Query<&mut Transform, With<Dropper>>,
     time: Res<Time>,
     dropper_stats: Res<DropperStats>,
+    input: Res<ActionState<Action>>,
 ) {
     if let Ok(mut transform) = dropper_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
-        if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
-            direction += Vec3::new(-1.0, 0.0, 0.0);
+        if input.pressed(Action::MoveLeft) {
+            direction += Vec3::new(-1., 0., 0.);
         }
 
-        if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
-            direction += Vec3::new(1.0, 0.0, 0.0);
+        if input.pressed(Action::MoveRight) {
+            direction += Vec3::new(1., 0., 0.);
         }
 
         if direction.length() > 0.0 {
@@ -123,6 +125,26 @@ fn dropper_movement(
         }
 
         transform.translation += direction * dropper_stats.speed * time.delta_seconds();
+    }
+}
+
+fn mouse_system(
+    mut cursor_evr: EventReader<CursorMoved>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
+    mut dropper_query: Query<&mut Transform, With<Dropper>>,
+) {
+    for ev in cursor_evr.read() {
+        println!("X: {}, Y: {}", ev.position.x, ev.position.y);
+        let (camera, camera_transform) = q_camera.single();
+
+        let blah = camera
+            .viewport_to_world_2d(camera_transform, Vec2::new(ev.position.x, ev.position.y))
+            .unwrap();
+
+    if let Ok(mut transform) = dropper_query.get_single_mut() {
+            transform.translation.x = blah.x;
+    }
+        println!("blax: {:?}", blah.x);
     }
 }
 
@@ -134,7 +156,7 @@ fn restrict_dropper_movement(
     let ball = get_ball_stats(loaded_ball.balltype);
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let min_x: f32 = -LEVEL_WIDTH / 2. + ball_size + 5.;
-    //let min_x: f32 = -(LEVEL_WIDTH + WALL_THICKNESS ) / 2. + get_ball_stats(loaded_ball.balltype).size;
+
     let max_x: f32 = LEVEL_WIDTH / 2. - ball_size - 5.;
     if let Ok(mut transform) = dropper_query.get_single_mut() {
         if transform.translation.x < min_x {

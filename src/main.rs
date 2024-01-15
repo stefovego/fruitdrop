@@ -2,6 +2,8 @@ use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_xpbd_2d::prelude::*;
 
+mod handle_input;
+
 mod camera;
 use camera::*;
 
@@ -40,6 +42,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(PhysicsPlugins::default())
+        .add_plugins(handle_input::InputPlugin)
         //.add_plugins(PhysicsDebugPlugin::default())
         // .add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
         .add_state::<AppState>()

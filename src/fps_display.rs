@@ -3,6 +3,10 @@ use bevy::{
     prelude::*,
 };
 
+use leafwing_input_manager::prelude::*;
+
+use crate::handle_input::Action;
+
 pub const FPS_DISPLAY_X: f32 = -760.;
 pub const FPS_DISPLAY_Y: f32 = 470.;
 
@@ -35,9 +39,9 @@ fn update_fps_display(
 
 fn toggle_display(
     mut visibility_query: Query<&mut Visibility, With<FpsDisplay>>,
-    keyboard_input: Res<Input<KeyCode>>,
+    input: Res<ActionState<Action>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::F8) {
+    if input.just_pressed(Action::ToggleFps) {
         let mut visible = visibility_query.single_mut();
         match *visible {
             Visibility::Visible => *visible = Visibility::Hidden,

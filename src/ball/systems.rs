@@ -1,3 +1,6 @@
+use bevy_xpbd_2d::prelude::*;
+use leafwing_input_manager::prelude::*;
+
 use crate::ball;
 use crate::ball::components::*;
 use crate::ball::resources::*;
@@ -5,12 +8,12 @@ use crate::ball::utils::*;
 use crate::dropper::components::Dropper;
 use crate::dropper::resources::DropperStats;
 use crate::dropper::resources::LoadedBall;
+use crate::handle_input::Action;
 use crate::loserbox::LoserBox;
 use crate::ondeck::OnDeckBall;
 use crate::physics::Layer;
 use crate::score::PlayerScore;
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
-use bevy_xpbd_2d::prelude::*;
 
 pub const KING_BALL: BallType = BallType::XXLarge;
 
@@ -168,7 +171,8 @@ pub fn spawn_ball(
     mut materials: ResMut<Assets<ColorMaterial>>,
     dropper_query: Query<&Transform, With<Dropper>>,
     mut drop_timer_query: Query<(Entity, &mut DropTimer)>,
-    keyboard_input: Res<Input<KeyCode>>,
+    // keyboard_input: Res<Input<KeyCode>>,
+    input: Res<ActionState<Action>>,
     time: Res<Time>,
     mut loadedball: ResMut<LoadedBall>,
     mut on_deck_ball: ResMut<OnDeckBall>,
@@ -186,7 +190,8 @@ pub fn spawn_ball(
     }
 
     if let Ok(transform) = dropper_query.get_single() {
-        if keyboard_input.just_pressed(KeyCode::Space) {
+        //if keyboard_input.just_pressed(KeyCode::Space) {
+        if input.just_pressed(Action::DropBall) {
             let balldata = get_ball_stats(loadedball.balltype);
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);

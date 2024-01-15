@@ -1,8 +1,11 @@
+use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use leafwing_input_manager::prelude::*;
+
 use crate::ball::resources::{BallScaler, GrowStats};
 use crate::dropper::resources::DropperStats;
 use crate::game_state::AppState;
-use bevy::prelude::*;
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use crate::handle_input::Action;
 
 pub struct MyGuiPlugin;
 
@@ -29,10 +32,10 @@ impl Plugin for MyGuiPlugin {
 }
 
 fn toggle_window_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    input: Res<ActionState<Action>>,
     mut tune_window: ResMut<TuneWindowResources>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::T) {
+    if input.just_pressed(Action::ToggleTune) {
         tune_window.window_opened = !tune_window.window_opened;
     }
 }
@@ -55,8 +58,9 @@ fn gui_setup(
             );
             ui.add(egui::Slider::new(&mut grow_stats.grow_speed, 0.0..=2.0).text("Grow Speed"));
             ui.add(egui::Slider::new(&mut slider_value, 1.0..=20.0).text("Ball Size"));
-            //ui.add(egui::Slider::new(&mut ball_scaler_stats.initial_size, 1.0..=50.0).text("Ball Size"));
+
             ui.add(egui::Separator::default());
+
             ui.add(egui::Label::new("Dropper Stats"));
             ui.add(egui::Slider::new(&mut dropper_stats.speed, 200.0..=1000.0).text("Speed"));
             ui.add(egui::Slider::new(&mut dropper_stats.delay_time, 0.0..=5.0).text("Delay"));
