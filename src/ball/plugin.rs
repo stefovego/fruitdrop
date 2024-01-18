@@ -1,13 +1,14 @@
-use crate::ball::resources::*;
-use crate::ball::systems::*;
+use crate::ball::{materials::BallMaterial, resources::*, systems::*};
 use crate::game_state::AppState;
 use bevy::prelude::*;
+use bevy::sprite::Material2dPlugin;
 
 pub struct BallPlugin;
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<BallScaler>()
+            .add_plugins(Material2dPlugin::<BallMaterial>::default())
             .register_type::<BallScaler>()
             .insert_resource(BallScaler {
                 initial_size: 10.,

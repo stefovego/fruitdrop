@@ -134,17 +134,15 @@ fn mouse_system(
     mut dropper_query: Query<&mut Transform, With<Dropper>>,
 ) {
     for ev in cursor_evr.read() {
-        println!("X: {}, Y: {}", ev.position.x, ev.position.y);
         let (camera, camera_transform) = q_camera.single();
 
         let blah = camera
             .viewport_to_world_2d(camera_transform, Vec2::new(ev.position.x, ev.position.y))
             .unwrap();
 
-    if let Ok(mut transform) = dropper_query.get_single_mut() {
+        if let Ok(mut transform) = dropper_query.get_single_mut() {
             transform.translation.x = blah.x;
-    }
-        println!("blax: {:?}", blah.x);
+        }
     }
 }
 

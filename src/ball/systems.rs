@@ -2,9 +2,8 @@ use bevy_xpbd_2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::ball;
-use crate::ball::components::*;
-use crate::ball::resources::*;
-use crate::ball::utils::*;
+use crate::ball::{components::*, materials::BallMaterial, resources::*, utils::*};
+
 use crate::dropper::components::Dropper;
 use crate::dropper::resources::DropperStats;
 use crate::dropper::resources::LoadedBall;
@@ -30,26 +29,25 @@ pub fn grow_balls(
             Entity,
             &mut Transform,
             &mut GrowTimer,
-            &Handle<ColorMaterial>,
         ),
         With<GrowTimer>,
     >,
     time: Res<Time>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<BallMaterial>>,
 ) {
-    for (entity, mut transform, mut grow_timer, mut handle_color) in &mut grow_timer_query {
+    for (entity, mut transform, mut grow_timer) in &mut grow_timer_query {
         grow_timer.timer.tick(time.delta());
         if grow_timer.timer.just_finished() {
             transform.scale = Vec3::new(1., 1., 1.0);
-            commands
-                .entity(entity)
-                .insert(materials.add(ColorMaterial::from(grow_timer.new_color)));
+            commands.entity(entity).insert(materials.add(BallMaterial {
+                color: grow_timer.new_color,
+            }));
             commands.entity(entity).remove::<GrowTimer>();
         } else {
             let grow_percent = (1. - grow_timer.initial_multiplier) * grow_timer.timer.percent()
                 + grow_timer.initial_multiplier;
             //TODO: This needs a clean up
-            let mut current_color = &mut materials.get_mut(handle_color).unwrap().color;
+            //let mut current_color = &mut materials.get_mut(handle_color).unwrap().color;
             let o = grow_timer.old_color.as_linear_rgba_f32();
             let old = Vec4::new(o[0], o[1], o[2], o[3]);
 
@@ -58,9 +56,10 @@ pub fn grow_balls(
 
             let m = old.lerp(new, grow_timer.timer.percent());
 
-            commands
-                .entity(entity)
-                .insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
+            commands.entity(entity).insert(materials.add(BallMaterial {
+                color: Color::rgba_linear(m.x, m.y, m.z, m.w),
+            }));
+            //.insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
             transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
         }
     }
@@ -109,7 +108,8 @@ pub fn handle_collisions(
     ball_query: Query<(Entity, &BallType, &Transform), With<Ball>>,
     mut collision_events: EventReader<CollisionStarted>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<BallMaterial>>,
+    //mut materials: ResMut<Assets<ColorMaterial>>,
     mut player_score: ResMut<PlayerScore>,
     ball_scaler: Res<BallScaler>,
     grow_stats: Res<GrowStats>,
@@ -132,7 +132,9 @@ pub fn handle_collisions(
                         ball_scaler.initial_size * ball_scaler.size_multiplier.powf(new_ball.level);
                     let mesh_material = MaterialMesh2dBundle {
                         mesh: meshes.add(shape::Circle::new(new_ball_size).into()).into(),
-                        material: materials.add(ColorMaterial::from(new_ball.color)),
+                        material: materials.add(BallMaterial {
+                            color: new_ball.color,
+                        }),
                         transform: Transform {
                             translation: third_ball_translation,
                             scale: Vec3::new(
@@ -168,7 +170,8 @@ pub fn handle_collisions(
 pub fn spawn_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<BallMaterial>>,
+    //mut materials: ResMut<Assets<ColorMaterial>>,
     dropper_query: Query<&Transform, With<Dropper>>,
     mut drop_timer_query: Query<(Entity, &mut DropTimer)>,
     // keyboard_input: Res<Input<KeyCode>>,
@@ -190,14 +193,15 @@ pub fn spawn_ball(
     }
 
     if let Ok(transform) = dropper_query.get_single() {
-        //if keyboard_input.just_pressed(KeyCode::Space) {
         if input.just_pressed(Action::DropBall) {
             let balldata = get_ball_stats(loadedball.balltype);
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
             let mesh_material = MaterialMesh2dBundle {
                 mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
-                material: materials.add(ColorMaterial::from(balldata.color)),
+                material: materials.add(BallMaterial {
+                    color: balldata.color,
+                }),
                 transform: Transform {
                     translation: Vec3::new(
                         transform.translation.x,
