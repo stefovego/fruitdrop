@@ -109,7 +109,6 @@ pub fn handle_collisions(
     mut collision_events: EventReader<CollisionStarted>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<BallMaterial>>,
-    //mut materials: ResMut<Assets<ColorMaterial>>,
     mut player_score: ResMut<PlayerScore>,
     ball_scaler: Res<BallScaler>,
     grow_stats: Res<GrowStats>,

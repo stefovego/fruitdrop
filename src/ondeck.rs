@@ -1,9 +1,11 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
-use crate::ball::utils::{get_ball_stats, random_ball};
-
-use crate::ball::components::BallType;
-use crate::ball::resources::BallScaler;
+use crate::ball::{
+    utils::{get_ball_stats, random_ball}, 
+    components::BallType, 
+    resources::BallScaler,
+    materials::BallMaterial,
+    };
 use crate::game_state::AppState;
 
 #[derive(Resource)]
@@ -55,7 +57,7 @@ fn tear_down_box(mut commands: Commands, box_query: Query<Entity, With<OnDeckBox
 fn spawn_deck(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<BallMaterial>>,
     mut on_deck_ball: ResMut<OnDeckBall>,
     ball_scaler: Res<BallScaler>,
 ) {
@@ -169,7 +171,7 @@ fn spawn_deck(
     let on_deck_ball_entity = commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
-            material: materials.add(ColorMaterial::from(ball.color)),
+            material:materials.add(BallMaterial{color: ball.color}),
             ..default()
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
@@ -186,7 +188,7 @@ fn on_deck_ball_change(
     on_deck_ball: Res<OnDeckBall>,
     mut on_deck_ball_query: Query<(&Parent, Entity), With<OnDeckBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<BallMaterial>>,
     ball_scaler: Res<BallScaler>,
 ) {
     if on_deck_ball.is_changed() {
@@ -199,7 +201,7 @@ fn on_deck_ball_change(
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
-                    material: materials.add(ColorMaterial::from(ball.color)),
+                    material: materials.add(BallMaterial{color: ball.color}),
                     ..default()
                 })
                 .insert(TransformBundle::from(Transform::from_xyz(0., 0., 1.)))

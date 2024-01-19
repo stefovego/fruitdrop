@@ -17,8 +17,8 @@ impl Plugin for BallPlugin {
             .init_resource::<GrowStats>()
             .register_type::<GrowStats>()
             .insert_resource(GrowStats {
-                initial_multiplier: 0.0,
-                grow_speed: 0.8,
+                initial_multiplier: 0.3,
+                grow_speed: 0.7,
             })
             .add_systems(Update, spawn_ball.run_if(in_state(AppState::InGame)))
             .add_systems(
