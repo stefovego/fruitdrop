@@ -1,11 +1,11 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 use crate::ball::{
-    utils::{get_ball_stats, random_ball}, 
-    components::BallType, 
-    resources::BallScaler,
+    components::BallType,
     materials::BallMaterial,
-    };
+    resources::BallScaler,
+    utils::{get_ball_stats, random_ball},
+};
 use crate::game_state::AppState;
 
 #[derive(Resource)]
@@ -171,7 +171,7 @@ fn spawn_deck(
     let on_deck_ball_entity = commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
-            material:materials.add(BallMaterial{color: ball.color}),
+            material: materials.add(BallMaterial { color: ball.color }),
             ..default()
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
@@ -201,7 +201,7 @@ fn on_deck_ball_change(
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
-                    material: materials.add(BallMaterial{color: ball.color}),
+                    material: materials.add(BallMaterial { color: ball.color }),
                     ..default()
                 })
                 .insert(TransformBundle::from(Transform::from_xyz(0., 0., 1.)))

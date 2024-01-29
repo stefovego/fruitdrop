@@ -24,14 +24,7 @@ pub fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Ball>>) 
 
 pub fn grow_balls(
     mut commands: Commands,
-    mut grow_timer_query: Query<
-        (
-            Entity,
-            &mut Transform,
-            &mut GrowTimer,
-        ),
-        With<GrowTimer>,
-    >,
+    mut grow_timer_query: Query<(Entity, &mut Transform, &mut GrowTimer), With<GrowTimer>>,
     time: Res<Time>,
     mut materials: ResMut<Assets<BallMaterial>>,
 ) {

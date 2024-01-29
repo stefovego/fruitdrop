@@ -2,7 +2,7 @@
   forward_io::VertexOutput,
    // mesh_view_bindings::globals,
   }
-#import noisy_bevy simplex_noise_3d
+#import noisy_bevy::simplex_noise_3d
 #import bevy_render::globals::Globals
 @group(0) @binding(1) var<uniform> globals: Globals;
 

@@ -4,7 +4,11 @@ use leafwing_input_manager::prelude::*;
 use crate::dropper::components::*;
 use crate::dropper::resources::*;
 
-use crate::ball::{resources::BallScaler, utils::{get_ball_stats, random_ball}, materials::BallMaterial};
+use crate::ball::{
+    materials::BallMaterial,
+    resources::BallScaler,
+    utils::{get_ball_stats, random_ball},
+};
 use crate::game_state::AppState;
 use crate::handle_input::Action;
 use crate::walls::{LEVEL_WIDTH, WALL_THICKNESS};
@@ -56,7 +60,7 @@ fn loaded_ball_change(
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
-                    material: materials.add(BallMaterial{color: ball.color}),
+                    material: materials.add(BallMaterial { color: ball.color }),
                     ..default()
                 })
                 .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
