@@ -29,7 +29,7 @@ fn update_fps_display(
     diagnostic: Res<DiagnosticsStore>,
 ) {
     for mut text in &mut score_text_query {
-        if let Some(fps) = diagnostic.get(FrameTimeDiagnosticsPlugin::FPS) {
+        if let Some(fps) = diagnostic.get(&FrameTimeDiagnosticsPlugin::FPS) {
             if let Some(value) = fps.smoothed() {
                 text.sections[1].value = format!("{value:.2}");
             }
@@ -41,7 +41,7 @@ fn toggle_display(
     mut visibility_query: Query<&mut Visibility, With<FpsDisplay>>,
     input: Res<ActionState<Action>>,
 ) {
-    if input.just_pressed(Action::ToggleFps) {
+    if input.just_pressed(&Action::ToggleFps) {
         let mut visible = visibility_query.single_mut();
         match *visible {
             Visibility::Visible => *visible = Visibility::Hidden,

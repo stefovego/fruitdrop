@@ -70,7 +70,7 @@ fn handle_collisions(
     mut next_state: ResMut<NextState<AppState>>,
 ) {
     for (loser_box_entity, loser_box_colllider, loser_box_transform) in &loser_box_query {
-        let aabb = loser_box_colllider.compute_aabb(loser_box_transform.translation.xy(), 0.);
+        let aabb = loser_box_colllider.aabb(loser_box_transform.translation.xy(), 0.);
         let aabb_intersections = spatial_query.aabb_intersections_with_aabb(aabb);
         for entity in aabb_intersections.iter() {
             if ball_query.contains(*entity) {
@@ -86,7 +86,7 @@ fn setup(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands.spawn((
-        Collider::cuboid(WIDTH, HEIGHT),
+        Collider::rectangle(WIDTH, HEIGHT),
         TransformBundle::from(Transform::from_xyz(0., BORDER_HEIGHT, 0.)),
         Sensor,
         LoserBox,
@@ -95,9 +95,7 @@ fn setup(
 
     commands
         .spawn(MaterialMesh2dBundle {
-            mesh: meshes
-                .add(shape::Quad::new(Vec2::new(WIDTH, 10.)).into())
-                .into(),
+            mesh: meshes.add(Rectangle::new(WIDTH, 10.)).into(),
             material: materials.add(ColorMaterial::from(Color::RED)),
             transform: Transform {
                 translation: Vec3::new(0., BORDER_HEIGHT, 1.0),

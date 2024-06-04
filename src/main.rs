@@ -55,7 +55,7 @@ fn main() {
         .add_plugins(handle_input::InputPlugin)
         //.add_plugins(PhysicsDebugPlugin::default())
         //.add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
-        .add_state::<AppState>()
+        .init_state::<AppState>()
         .add_plugins(BallPlugin)
         .add_plugins(CameraPlugin)
         .add_plugins(WallsPlugin)
@@ -69,19 +69,18 @@ fn main() {
         .add_plugins(physics::PhysicsPlugin)
         .add_systems(Startup, update_canvas_size)
         //.add_systems(Startup, update_canvas_size.run_if(cfg!(target_arch = "wasm32")))
-    .run();
-
+        .run();
 }
 
 //#[cfg(target_arch = "wasm32")]
 fn update_canvas_size(mut window: Query<&mut Window, With<PrimaryWindow>>) {
     (|| {
         if cfg!(target_arch = "wasm32") {
-        let mut window = window.get_single_mut().ok()?;
-        let browser_window = web_sys::window()?;
-        let width = browser_window.inner_width().ok()?.as_f64()?;
-        let height = browser_window.inner_height().ok()?.as_f64()?;
-        window.resolution.set(width as f32, height as f32);
+            let mut window = window.get_single_mut().ok()?;
+            let browser_window = web_sys::window()?;
+            let width = browser_window.inner_width().ok()?.as_f64()?;
+            let height = browser_window.inner_height().ok()?.as_f64()?;
+            window.resolution.set(width as f32, height as f32);
         }
         Some(())
     })();

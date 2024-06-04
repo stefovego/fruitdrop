@@ -29,15 +29,15 @@ fn tear_down(mut commands: Commands, gameover_query: Query<Entity, With<GameOver
 }
 fn exit_gameover_screen(
     mut next_state: ResMut<NextState<AppState>>,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::Return) {
+    if keyboard_input.just_pressed(KeyCode::Enter) {
         next_state.set(AppState::InGame);
     }
 }
 fn trigger_gameover(
     mut next_state: ResMut<NextState<AppState>>,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::F6) {
         next_state.set(AppState::GameOver);
@@ -53,9 +53,7 @@ fn setup(
 ) {
     commands.spawn((
         MaterialMesh2dBundle {
-            mesh: meshes
-                .add(shape::Quad::new(Vec2::new(WIDTH, HEIGHT).into()).into())
-                .into(),
+            mesh: meshes.add(Rectangle::new(WIDTH, HEIGHT)).into(),
             material: materials.add(ColorMaterial::from(Color::TOMATO)),
             transform: Transform {
                 translation: Vec3 {

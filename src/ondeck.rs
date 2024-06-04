@@ -170,7 +170,7 @@ fn spawn_deck(
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let on_deck_ball_entity = commands
         .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
+            mesh: meshes.add(Circle::new(ball_size)).into(),
             material: materials.add(BallMaterial { color: ball.color }),
             ..default()
         })
@@ -200,7 +200,7 @@ fn on_deck_ball_change(
             let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
+                    mesh: meshes.add(Circle::new(ball_size)).into(),
                     material: materials.add(BallMaterial { color: ball.color }),
                     ..default()
                 })

@@ -59,7 +59,7 @@ fn loaded_ball_change(
             let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
+                    mesh: meshes.add(Circle::new(ball_size)).into(),
                     material: materials.add(BallMaterial { color: ball.color }),
                     ..default()
                 })
@@ -96,7 +96,7 @@ fn spawn_dropper(
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let loadball_entity = commands
         .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
+            mesh: meshes.add(Circle::new(ball_size)).into(),
             material: materials.add(ColorMaterial::from(ball.color)),
             ..default()
         })
@@ -116,11 +116,11 @@ fn dropper_movement(
     if let Ok(mut transform) = dropper_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
-        if input.pressed(Action::MoveLeft) {
+        if input.pressed(&Action::MoveLeft) {
             direction += Vec3::new(-1., 0., 0.);
         }
 
-        if input.pressed(Action::MoveRight) {
+        if input.pressed(&Action::MoveRight) {
             direction += Vec3::new(1., 0., 0.);
         }
 

@@ -35,7 +35,7 @@ fn toggle_window_system(
     input: Res<ActionState<Action>>,
     mut tune_window: ResMut<TuneWindowResources>,
 ) {
-    if input.just_pressed(Action::ToggleTune) {
+    if input.just_pressed(&Action::ToggleTune) {
         tune_window.window_opened = !tune_window.window_opened;
     }
 }

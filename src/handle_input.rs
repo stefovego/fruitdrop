@@ -8,14 +8,14 @@ impl Plugin for InputPlugin {
             .init_resource::<ActionState<Action>>()
             .insert_resource(
                 InputMap::default()
-                    .insert(KeyCode::Left, Action::MoveLeft)
-                    .insert(KeyCode::A, Action::MoveLeft)
-                    .insert(KeyCode::Right, Action::MoveRight)
-                    .insert(KeyCode::D, Action::MoveRight)
-                    .insert(KeyCode::Space, Action::DropBall)
-                    .insert(MouseButton::Left, Action::DropBall)
-                    .insert(KeyCode::T, Action::ToggleTune)
-                    .insert(KeyCode::F, Action::ToggleFps)
+                    .insert(Action::MoveLeft, KeyCode::ArrowLeft)
+                    .insert(Action::MoveLeft, KeyCode::KeyA)
+                    .insert(Action::MoveRight, KeyCode::ArrowRight)
+                    .insert(Action::MoveRight, KeyCode::KeyD)
+                    .insert(Action::DropBall, KeyCode::Space)
+                    .insert(Action::DropBall, MouseButton::Left)
+                    .insert(Action::ToggleTune, KeyCode::KeyT)
+                    .insert(Action::ToggleFps, KeyCode::KeyF)
                     .build(),
             );
     }

@@ -37,7 +37,7 @@ pub fn grow_balls(
             }));
             commands.entity(entity).remove::<GrowTimer>();
         } else {
-            let grow_percent = (1. - grow_timer.initial_multiplier) * grow_timer.timer.percent()
+            let grow_percent = (1. - grow_timer.initial_multiplier) * grow_timer.timer.fraction()
                 + grow_timer.initial_multiplier;
             //TODO: This needs a clean up
             //let mut current_color = &mut materials.get_mut(handle_color).unwrap().color;
@@ -47,7 +47,7 @@ pub fn grow_balls(
             let n = grow_timer.new_color.as_linear_rgba_f32();
             let new = Vec4::new(n[0], n[1], n[2], n[3]);
 
-            let m = old.lerp(new, grow_timer.timer.percent());
+            let m = old.lerp(new, grow_timer.timer.fraction());
 
             commands.entity(entity).insert(materials.add(BallMaterial {
                 color: Color::rgba_linear(m.x, m.y, m.z, m.w),
@@ -87,7 +87,7 @@ pub fn seed_systems(
 ) {
     for (entity, mut collision_layer) in &mut seed_query {
         // collision_layer.remove_mask(Layer::NotBall);
-        collision_layer.add_mask(Layer::Ball);
+        collision_layer.memberships.add(Layer::Ball);
         commands.entity(entity).remove::<CollisionLayers>();
         commands.entity(entity).remove::<Seed>();
         commands.entity(entity).insert(CollisionLayers::new(
@@ -123,7 +123,7 @@ pub fn handle_collisions(
                     let new_ball_size =
                         ball_scaler.initial_size * ball_scaler.size_multiplier.powf(new_ball.level);
                     let mesh_material = MaterialMesh2dBundle {
-                        mesh: meshes.add(shape::Circle::new(new_ball_size).into()).into(),
+                        mesh: meshes.add(Circle::new(new_ball_size)).into(),
                         material: materials.add(BallMaterial {
                             color: new_ball.color,
                         }),
@@ -185,12 +185,12 @@ pub fn spawn_ball(
     }
 
     if let Ok(transform) = dropper_query.get_single() {
-        if input.just_pressed(Action::DropBall) {
+        if input.just_pressed(&Action::DropBall) {
             let balldata = get_ball_stats(loadedball.balltype);
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
             let mesh_material = MaterialMesh2dBundle {
-                mesh: meshes.add(shape::Circle::new(ball_size).into()).into(),
+                mesh: meshes.add(Circle::new(ball_size)).into(),
                 material: materials.add(BallMaterial {
                     color: balldata.color,
                 }),
@@ -233,7 +233,7 @@ pub fn ball_scaler_changed(
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball_stats.level);
             commands
                 .entity(entity)
-                .insert(meshes.add(shape::Circle::new(new_ball_size).into()));
+                .insert(meshes.add(Circle::new(new_ball_size)));
         }
     }
 }
