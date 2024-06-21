@@ -1,4 +1,3 @@
-use bevy::sprite::Material2d;
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_xpbd_2d::prelude::*;
 
@@ -33,7 +32,7 @@ pub fn new(
     BallBundle {
         material_mesh_2d: materialmesh,
         rigid_body: RigidBody::Dynamic,
-        collider: Collider::ball(ball_size),
+        collider: Collider::circle(ball_size),
         collision_layer: CollisionLayers::new([Layer::Ball], [Layer::Ball, Layer::Wall]),
         gravity_scale: GravityScale(20.0),
         collider_density: ColliderDensity(BALL_DENSITY),
@@ -53,7 +52,7 @@ pub fn new_seed(
     BallBundle {
         material_mesh_2d: materialmesh,
         rigid_body: RigidBody::Dynamic,
-        collider: Collider::ball(ball_size),
+        collider: Collider::circle(ball_size),
         collision_layer: CollisionLayers::new([Layer::NotBall], [Layer::Ball, Layer::Wall]),
         gravity_scale: GravityScale(20.0),
         collider_density: ColliderDensity(BALL_DENSITY),

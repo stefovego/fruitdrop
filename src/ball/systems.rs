@@ -33,7 +33,7 @@ pub fn grow_balls(
         if grow_timer.timer.just_finished() {
             transform.scale = Vec3::new(1., 1., 1.0);
             commands.entity(entity).insert(materials.add(BallMaterial {
-                color: grow_timer.new_color,
+                color: grow_timer.new_color.into(),
             }));
             commands.entity(entity).remove::<GrowTimer>();
         } else {
@@ -41,16 +41,16 @@ pub fn grow_balls(
                 + grow_timer.initial_multiplier;
             //TODO: This needs a clean up
             //let mut current_color = &mut materials.get_mut(handle_color).unwrap().color;
-            let o = grow_timer.old_color.as_linear_rgba_f32();
-            let old = Vec4::new(o[0], o[1], o[2], o[3]);
+            let old = grow_timer.old_color.to_vec4();
+            //let old = Vec4::new(o[0], o[1], o[2], o[3]);
 
-            let n = grow_timer.new_color.as_linear_rgba_f32();
-            let new = Vec4::new(n[0], n[1], n[2], n[3]);
+            let new = grow_timer.new_color.to_vec4();
+            // let new = Vec4::new(n[0], n[1], n[2], n[3]);
 
             let m = old.lerp(new, grow_timer.timer.fraction());
 
             commands.entity(entity).insert(materials.add(BallMaterial {
-                color: Color::rgba_linear(m.x, m.y, m.z, m.w),
+                color: LinearRgba::from_vec4(m),
             }));
             //.insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
             transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
@@ -125,7 +125,7 @@ pub fn handle_collisions(
                     let mesh_material = MaterialMesh2dBundle {
                         mesh: meshes.add(Circle::new(new_ball_size)).into(),
                         material: materials.add(BallMaterial {
-                            color: new_ball.color,
+                            color: new_ball.color.into(),
                         }),
                         transform: Transform {
                             translation: third_ball_translation,
@@ -147,8 +147,8 @@ pub fn handle_collisions(
                         .insert(GrowTimer {
                             timer: Timer::from_seconds(grow_stats.grow_speed, TimerMode::Once),
                             initial_multiplier: grow_stats.initial_multiplier,
-                            old_color: og_ball_type.color,
-                            new_color: new_ball.color,
+                            old_color: og_ball_type.color.into(),
+                            new_color: new_ball.color.into(),
                         })
                         .insert(Seed);
                 } else {
@@ -172,7 +172,7 @@ pub fn spawn_ball(
     mut loadedball: ResMut<LoadedBall>,
     mut on_deck_ball: ResMut<OnDeckBall>,
     ball_scaler: Res<BallScaler>,
-    grow_stats: Res<GrowStats>,
+    _grow_stats: Res<GrowStats>,
     dropper_stats: Res<DropperStats>,
 ) {
     for (entity, mut droptimer) in &mut drop_timer_query {
@@ -192,7 +192,7 @@ pub fn spawn_ball(
             let mesh_material = MaterialMesh2dBundle {
                 mesh: meshes.add(Circle::new(ball_size)).into(),
                 material: materials.add(BallMaterial {
-                    color: balldata.color,
+                    color: balldata.color.into(),
                 }),
                 transform: Transform {
                     translation: Vec3::new(

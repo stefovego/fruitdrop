@@ -1,8 +1,8 @@
+use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy::{input::common_conditions::input_toggle_active, prelude::*};
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+//use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_xpbd_2d::prelude::*;
-use noisy_bevy::NoisyShaderPlugin;
+//use noisy_bevy::NoisyShaderPlugin;
 use web_sys;
 
 mod handle_input;
@@ -50,7 +50,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins(NoisyShaderPlugin)
+        //.add_plugins(NoisyShaderPlugin)
         .add_plugins(PhysicsPlugins::default())
         .add_plugins(handle_input::InputPlugin)
         //.add_plugins(PhysicsDebugPlugin::default())

@@ -12,16 +12,17 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = "0.13.2"
-bevy-inspector-egui = "0.23"
-bevy_egui = "0.26"
-#bevy_rapier2d = {version = "0.23.0", features = ["debug-render-2d"] }
-bevy_xpbd_2d = { version = "0.4", features = ["debug-plugin", "2d"] }
-leafwing-input-manager = "0.13"
-noisy_bevy = "0.6"
+nalgebra="^0.26"
+#bevy= { git = "https://github.com/bevyengine/bevy"}
+bevy = { version="0.14.0-rc.3"}
+#bevy_ecs = {version = "^0.14.0-rc.2", features=["serve"}
+#bevy-inspector-egui = "0.23"
+bevy_egui = { git = "https://github.com/Friz64/bevy_egui/", branch = "bevy-0.14" }
+bevy_xpbd_2d = {git = "https://github.com/Jondolf/bevy_xpbd", branch = "bevy-0.14", features = ["debug-plugin", "2d"] }
+#leafwing-input-manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager", branch = "v0.14-rc" }
+leafwing-input-manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager"}
+#noisy_bevy = "0.6"
 web-sys = { version = "0.3.67", features = ["Window"] }
-# bevy_xpbd_2d = {version = "0.3.2", features = ["debug-plugin", "2d"]}
-#bevy_rapier2d = {version = "0.23.0", features = ["simd-stable", "debug-render-2d"] }
 rand = "0.8.5"
 
 [target.'cfg(wasm)'.dependencies]

@@ -32,7 +32,7 @@ fn spawn_walls(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::GRAY,
+                color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
                 custom_size: Some(Vec2::new(LEVEL_WIDTH, WALL_THICKNESS)),
                 ..default()
             },
@@ -40,7 +40,7 @@ fn spawn_walls(mut commands: Commands) {
             ..default()
         },
         RigidBody::Static,
-        Collider::cuboid(LEVEL_WIDTH, WALL_THICKNESS),
+        Collider::rectangle(LEVEL_WIDTH, WALL_THICKNESS),
         CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
         Wall,
         Name::new("Bottom Wall"),
@@ -50,7 +50,7 @@ fn spawn_walls(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::GRAY,
+                color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
                 custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
                 ..default()
             },
@@ -58,7 +58,7 @@ fn spawn_walls(mut commands: Commands) {
             ..default()
         },
         RigidBody::Static,
-        Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
+        Collider::rectangle(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
         CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
         Wall,
         Name::new("Left Wall"),
@@ -68,7 +68,7 @@ fn spawn_walls(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::GRAY,
+                color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
                 custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
                 ..default()
             },
@@ -76,7 +76,7 @@ fn spawn_walls(mut commands: Commands) {
             ..default()
         },
         RigidBody::Static,
-        Collider::cuboid(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
+        Collider::rectangle(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
         CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
         Wall,
         Name::new("Right Wall"),

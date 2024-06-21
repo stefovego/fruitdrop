@@ -38,13 +38,13 @@ fn tear_down(mut commands: Commands, loser_box_query: Query<Entity, With<LoserBo
 fn danger_warning(
     mut commands: Commands,
     ball_query: Query<&Transform, (With<Ball>, Without<FreshBall>)>,
-    mut warning_query: Query<(Entity, &Handle<ColorMaterial>, &DangerWarning), With<DangerWarning>>,
+    warning_query: Query<(Entity, &Handle<ColorMaterial>, &DangerWarning), With<DangerWarning>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let mut danger_amount: f32 = 0.;
     let mut largest_y: f32 = -500.;
 
-    for (ball_transform) in &ball_query {
+    for ball_transform in &ball_query {
         if ball_transform.translation.y > largest_y {
             largest_y = ball_transform.translation.y;
         }
@@ -53,11 +53,11 @@ fn danger_warning(
         }
     }
 
-    for (warning_entity, warning_color, danger_bar) in &warning_query {
+    for (warning_entity, _warning_color, danger_bar) in &warning_query {
         commands
             .entity(warning_entity)
             .insert(materials.add(ColorMaterial {
-                color: danger_bar.color.with_a(danger_amount),
+                color: danger_bar.color.with_alpha(danger_amount),
                 ..default()
             }));
     }
@@ -69,7 +69,7 @@ fn handle_collisions(
     loser_box_query: Query<(Entity, &Collider, &Transform), With<LoserBox>>,
     mut next_state: ResMut<NextState<AppState>>,
 ) {
-    for (loser_box_entity, loser_box_colllider, loser_box_transform) in &loser_box_query {
+    for (_loser_box_entity, loser_box_colllider, loser_box_transform) in &loser_box_query {
         let aabb = loser_box_colllider.aabb(loser_box_transform.translation.xy(), 0.);
         let aabb_intersections = spatial_query.aabb_intersections_with_aabb(aabb);
         for entity in aabb_intersections.iter() {
@@ -96,7 +96,7 @@ fn setup(
     commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Rectangle::new(WIDTH, 10.)).into(),
-            material: materials.add(ColorMaterial::from(Color::RED)),
+            material: materials.add(ColorMaterial::from_color(Color::linear_rgb(1.0, 0.0, 0.0))),
             transform: Transform {
                 translation: Vec3::new(0., BORDER_HEIGHT, 1.0),
                 ..default()
@@ -108,6 +108,8 @@ fn setup(
             BORDER_HEIGHT,
             0.0,
         )))
-        .insert(DangerWarning { color: Color::RED })
+        .insert(DangerWarning {
+            color: Color::linear_rgb(1.0, 0.0, 0.0),
+        })
         .insert(Name::new("danger_warning"));
 }

@@ -17,9 +17,9 @@ pub struct DropTimer {
 #[derive(Component)]
 pub struct GrowTimer {
     pub timer: Timer,
-    pub old_color: Color,
+    pub old_color: LinearRgba,
     pub initial_multiplier: f32,
-    pub new_color: Color,
+    pub new_color: LinearRgba,
 }
 
 #[derive(Component, Debug, PartialEq, Eq, Clone, Copy)]

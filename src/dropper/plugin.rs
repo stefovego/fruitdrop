@@ -11,7 +11,7 @@ use crate::ball::{
 };
 use crate::game_state::AppState;
 use crate::handle_input::Action;
-use crate::walls::{LEVEL_WIDTH, WALL_THICKNESS};
+use crate::walls::LEVEL_WIDTH;
 
 pub struct DropperPlugin;
 impl Plugin for DropperPlugin {
@@ -97,7 +97,7 @@ fn spawn_dropper(
     let loadball_entity = commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Circle::new(ball_size)).into(),
-            material: materials.add(ColorMaterial::from(ball.color)),
+            material: materials.add(ColorMaterial::from_color(ball.color)),
             ..default()
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))

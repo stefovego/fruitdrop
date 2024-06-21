@@ -54,7 +54,9 @@ fn setup(
     commands.spawn((
         MaterialMesh2dBundle {
             mesh: meshes.add(Rectangle::new(WIDTH, HEIGHT)).into(),
-            material: materials.add(ColorMaterial::from(Color::TOMATO)),
+            material: materials.add(ColorMaterial::from_color(LinearRgba::rgb(
+                1.0, 0.388, 0.278,
+            ))), //TOMATO
             transform: Transform {
                 translation: Vec3 {
                     x: 0.,

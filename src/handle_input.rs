@@ -6,18 +6,7 @@ impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(InputManagerPlugin::<Action>::default())
             .init_resource::<ActionState<Action>>()
-            .insert_resource(
-                InputMap::default()
-                    .insert(Action::MoveLeft, KeyCode::ArrowLeft)
-                    .insert(Action::MoveLeft, KeyCode::KeyA)
-                    .insert(Action::MoveRight, KeyCode::ArrowRight)
-                    .insert(Action::MoveRight, KeyCode::KeyD)
-                    .insert(Action::DropBall, KeyCode::Space)
-                    .insert(Action::DropBall, MouseButton::Left)
-                    .insert(Action::ToggleTune, KeyCode::KeyT)
-                    .insert(Action::ToggleFps, KeyCode::KeyF)
-                    .build(),
-            );
+            .insert_resource(Action::mk_input_map());
     }
 }
 
@@ -28,6 +17,16 @@ pub enum Action {
     DropBall,
     ToggleTune,
     ToggleFps,
+}
+
+impl Action {
+    fn mk_input_map() -> InputMap<Self> {
+        InputMap::new([(Self::MoveLeft, KeyCode::ArrowLeft)])
+            .with(Self::MoveRight, KeyCode::ArrowRight)
+            .with(Self::DropBall, KeyCode::Space)
+            .with(Self::ToggleTune, KeyCode::KeyT)
+            .with(Self::ToggleFps, KeyCode::KeyF)
+    }
 }
 
 #[derive(Component)]

@@ -66,7 +66,7 @@ fn spawn_deck(
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
+                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
                 custom_size: Some(Vec2 {
                     x: BOX_WIDTH,
                     y: BOX_THICKNESS,
@@ -88,7 +88,7 @@ fn spawn_deck(
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
+                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
                 custom_size: Some(Vec2 {
                     x: BOX_WIDTH,
                     y: BOX_THICKNESS,
@@ -111,7 +111,7 @@ fn spawn_deck(
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
+                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
                 custom_size: Some(Vec2 {
                     x: BOX_THICKNESS,
                     y: BOX_HEIGHT,
@@ -134,7 +134,7 @@ fn spawn_deck(
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::ORANGE,
+                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
                 custom_size: Some(Vec2 {
                     x: BOX_THICKNESS,
                     y: BOX_HEIGHT,
@@ -171,7 +171,9 @@ fn spawn_deck(
     let on_deck_ball_entity = commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Circle::new(ball_size)).into(),
-            material: materials.add(BallMaterial { color: ball.color }),
+            material: materials.add(BallMaterial {
+                color: ball.color.into(),
+            }),
             ..default()
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
@@ -201,7 +203,9 @@ fn on_deck_ball_change(
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Circle::new(ball_size)).into(),
-                    material: materials.add(BallMaterial { color: ball.color }),
+                    material: materials.add(BallMaterial {
+                        color: ball.color.into(),
+                    }),
                     ..default()
                 })
                 .insert(TransformBundle::from(Transform::from_xyz(0., 0., 1.)))
