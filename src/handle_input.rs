@@ -24,6 +24,7 @@ impl Action {
         InputMap::new([(Self::MoveLeft, KeyCode::ArrowLeft)])
             .with(Self::MoveRight, KeyCode::ArrowRight)
             .with(Self::DropBall, KeyCode::Space)
+            .with(Self::DropBall, MouseButton::Left)
             .with(Self::ToggleTune, KeyCode::KeyT)
             .with(Self::ToggleFps, KeyCode::KeyF)
     }
