@@ -1,4 +1,4 @@
-use bevy_xpbd_2d::prelude::*;
+use avian2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::ball;
@@ -26,16 +26,20 @@ pub fn grow_balls(
     mut commands: Commands,
     mut grow_timer_query: Query<(Entity, &mut Transform, &mut GrowTimer), With<GrowTimer>>,
     time: Res<Time>,
-    mut materials: ResMut<Assets<BallMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    //mut materials: ResMut<Assets<BallMaterial>>,
 ) {
     for (entity, mut transform, mut grow_timer) in &mut grow_timer_query {
         grow_timer.timer.tick(time.delta());
         if grow_timer.timer.just_finished() {
             transform.scale = Vec3::new(1., 1., 1.0);
-            commands.entity(entity).insert(materials.add(BallMaterial {
-                color: grow_timer.new_color.into(),
-            }));
-            commands.entity(entity).remove::<GrowTimer>();
+            commands
+                .entity(entity)
+                .insert(materials.add(ColorMaterial::from_color(grow_timer.new_color)));
+            // commands.entity(entity).insert(materials.add(BallMaterial {
+            //     color: grow_timer.new_color.into(),
+            // }));
+            // commands.entity(entity).remove::<GrowTimer>();
         } else {
             let grow_percent = (1. - grow_timer.initial_multiplier) * grow_timer.timer.fraction()
                 + grow_timer.initial_multiplier;
@@ -49,9 +53,9 @@ pub fn grow_balls(
 
             let m = old.lerp(new, grow_timer.timer.fraction());
 
-            commands.entity(entity).insert(materials.add(BallMaterial {
-                color: LinearRgba::from_vec4(m),
-            }));
+            commands
+                .entity(entity)
+                .insert(materials.add(ColorMaterial::from_color(LinearRgba::from_vec4(m))));
             //.insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
             transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
         }
@@ -101,7 +105,8 @@ pub fn handle_collisions(
     ball_query: Query<(Entity, &BallType, &Transform), With<Ball>>,
     mut collision_events: EventReader<CollisionStarted>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BallMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    //mut materials: ResMut<Assets<BallMaterial>>,
     mut player_score: ResMut<PlayerScore>,
     ball_scaler: Res<BallScaler>,
     grow_stats: Res<GrowStats>,
@@ -124,9 +129,7 @@ pub fn handle_collisions(
                         ball_scaler.initial_size * ball_scaler.size_multiplier.powf(new_ball.level);
                     let mesh_material = MaterialMesh2dBundle {
                         mesh: meshes.add(Circle::new(new_ball_size)).into(),
-                        material: materials.add(BallMaterial {
-                            color: new_ball.color.into(),
-                        }),
+                        material: materials.add(ColorMaterial::from_color(new_ball.color)),
                         transform: Transform {
                             translation: third_ball_translation,
                             scale: Vec3::new(
@@ -162,8 +165,8 @@ pub fn handle_collisions(
 pub fn spawn_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BallMaterial>>,
-    //mut materials: ResMut<Assets<ColorMaterial>>,
+    //mut materials: ResMut<Assets<BallMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     dropper_query: Query<&Transform, With<Dropper>>,
     mut drop_timer_query: Query<(Entity, &mut DropTimer)>,
     // keyboard_input: Res<Input<KeyCode>>,
@@ -191,9 +194,10 @@ pub fn spawn_ball(
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
             let mesh_material = MaterialMesh2dBundle {
                 mesh: meshes.add(Circle::new(ball_size)).into(),
-                material: materials.add(BallMaterial {
-                    color: balldata.color.into(),
-                }),
+                // material: materials.add(BallMaterial {
+                //     color: balldata.color,
+                // }),
+                material: materials.add(ColorMaterial::from_color(balldata.color)),
                 transform: Transform {
                     translation: Vec3::new(
                         transform.translation.x,

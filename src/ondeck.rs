@@ -6,7 +6,7 @@ use crate::ball::{
     resources::BallScaler,
     utils::{get_ball_stats, random_ball},
 };
-use crate::game_state::AppState;
+use crate::game_state::{AppState, GameState};
 
 #[derive(Resource)]
 pub struct OnDeckBall {
@@ -36,9 +36,12 @@ impl Plugin for OnDeckPlugin {
             balltype: random_ball(),
         })
         .add_systems(OnEnter(AppState::InGame), spawn_deck)
-        .add_systems(Update, on_deck_ball_change)
-        .add_systems(OnExit(AppState::GameOver), tear_down_ball)
-        .add_systems(OnExit(AppState::GameOver), tear_down_box);
+        .add_systems(
+            Update,
+            on_deck_ball_change.run_if(in_state(GameState::Playing)),
+        )
+        .add_systems(OnExit(AppState::InGame), tear_down_ball)
+        .add_systems(OnExit(AppState::InGame), tear_down_box);
     }
 }
 
@@ -57,7 +60,8 @@ fn tear_down_box(mut commands: Commands, box_query: Query<Entity, With<OnDeckBox
 fn spawn_deck(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BallMaterial>>,
+    //mut materials: ResMut<Assets<BallMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     mut on_deck_ball: ResMut<OnDeckBall>,
     ball_scaler: Res<BallScaler>,
 ) {
@@ -171,9 +175,10 @@ fn spawn_deck(
     let on_deck_ball_entity = commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Circle::new(ball_size)).into(),
-            material: materials.add(BallMaterial {
-                color: ball.color.into(),
-            }),
+            material: materials.add(ColorMaterial::from_color(ball.color)),
+            // material: materials.add(BallMaterial {
+            //     color: ball.color.into(),
+            // }),
             ..default()
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
@@ -190,7 +195,8 @@ fn on_deck_ball_change(
     on_deck_ball: Res<OnDeckBall>,
     mut on_deck_ball_query: Query<(&Parent, Entity), With<OnDeckBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BallMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    //mut materials: ResMut<Assets<BallMaterial>>,
     ball_scaler: Res<BallScaler>,
 ) {
     if on_deck_ball.is_changed() {
@@ -203,9 +209,10 @@ fn on_deck_ball_change(
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Circle::new(ball_size)).into(),
-                    material: materials.add(BallMaterial {
-                        color: ball.color.into(),
-                    }),
+                    material: materials.add(ColorMaterial::from_color(ball.color)),
+                    // material: materials.add(BallMaterial {
+                    //     color: ball.color.into(),
+                    // }),
                     ..default()
                 })
                 .insert(TransformBundle::from(Transform::from_xyz(0., 0., 1.)))

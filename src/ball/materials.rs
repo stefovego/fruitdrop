@@ -7,13 +7,11 @@ use bevy::{
 
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct BallMaterial {
-    //    #[uniform(0)]
+    #[uniform(0)]
     pub color: LinearRgba,
 }
 
 impl Material2d for BallMaterial {
-    //impl Material2d for BallMaterial {
     //fn fragment_shader() -> ShaderRef {
     //"shaders/custom_material.wgsl".into()
-    //}
 }

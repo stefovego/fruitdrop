@@ -1,8 +1,7 @@
+use avian2d::prelude::*;
 use bevy::prelude::*;
-// use bevy_rapier2d::prelude::*;
-use bevy_xpbd_2d::prelude::*;
 
-use crate::game_state::AppState;
+use crate::game_state::{AppState, GameState};
 use crate::physics::Layer;
 
 pub const LEVEL_WIDTH: f32 = 700.;
@@ -14,7 +13,7 @@ pub struct WallsPlugin;
 impl Plugin for WallsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::InGame), spawn_walls)
-            .add_systems(OnExit(AppState::GameOver), tear_down);
+            .add_systems(OnExit(AppState::InGame), tear_down);
     }
 }
 
@@ -28,6 +27,7 @@ fn tear_down(mut commands: Commands, wall_query: Query<Entity, With<Wall>>) {
 }
 
 fn spawn_walls(mut commands: Commands) {
+    info!("setup spawn_walls");
     // Spawn Bottom Wall
     commands.spawn((
         SpriteBundle {

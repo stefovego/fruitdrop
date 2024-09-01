@@ -9,7 +9,7 @@ use crate::ball::{
     resources::BallScaler,
     utils::{get_ball_stats, random_ball},
 };
-use crate::game_state::AppState;
+use crate::game_state::{AppState, GameState};
 use crate::handle_input::Action;
 use crate::walls::LEVEL_WIDTH;
 
@@ -28,10 +28,10 @@ impl Plugin for DropperPlugin {
             Update,
             (dropper_movement, mouse_system, restrict_dropper_movement)
                 .chain()
-                .run_if(in_state(AppState::InGame)),
+                .run_if(in_state(GameState::Playing)),
         )
         .add_systems(Update, loaded_ball_change)
-        .add_systems(OnExit(AppState::GameOver), tear_down);
+        .add_systems(OnExit(AppState::InGame), tear_down);
     }
 }
 
@@ -46,8 +46,8 @@ fn loaded_ball_change(
     loaded_ball: Res<LoadedBall>,
     mut load_ball_query: Query<(&Parent, Entity), With<LoadedBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BallMaterial>>,
-    // mut materials: ResMut<Assets<ColorMaterial>>,
+    //mut materials: ResMut<Assets<BallMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     ball_scaler: Res<BallScaler>,
 ) {
     if loaded_ball.is_changed() {
@@ -60,7 +60,7 @@ fn loaded_ball_change(
             let loadball_entity = commands
                 .spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Circle::new(ball_size)).into(),
-                    material: materials.add(BallMaterial { color: ball.color }),
+                    material: materials.add(ColorMaterial::from_color(ball.color)),
                     ..default()
                 })
                 .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))

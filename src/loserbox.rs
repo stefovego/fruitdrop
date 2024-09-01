@@ -1,9 +1,9 @@
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
-use bevy_xpbd_2d::prelude::*;
 
 use crate::ball::components::{Ball, FreshBall};
-use crate::game_state::AppState;
+use crate::game_state::GameState;
 
 pub const WIDTH: f32 = 700.;
 pub const HEIGHT: f32 = 50.;
@@ -14,10 +14,13 @@ pub struct LoserBoxPlugin;
 
 impl Plugin for LoserBoxPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::InGame), setup)
-            .add_systems(OnExit(AppState::GameOver), tear_down)
-            .add_systems(Update, handle_collisions.run_if(in_state(AppState::InGame)))
-            .add_systems(Update, danger_warning.run_if(in_state(AppState::InGame)));
+        app.add_systems(OnEnter(GameState::Playing), setup)
+            .add_systems(OnExit(GameState::GameOver), tear_down)
+            .add_systems(
+                Update,
+                handle_collisions.run_if(in_state(GameState::Playing)),
+            )
+            .add_systems(Update, danger_warning.run_if(in_state(GameState::Playing)));
     }
 }
 
@@ -67,14 +70,14 @@ fn handle_collisions(
     spatial_query: SpatialQuery,
     ball_query: Query<Entity, (With<Ball>, Without<FreshBall>)>,
     loser_box_query: Query<(Entity, &Collider, &Transform), With<LoserBox>>,
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     for (_loser_box_entity, loser_box_colllider, loser_box_transform) in &loser_box_query {
         let aabb = loser_box_colllider.aabb(loser_box_transform.translation.xy(), 0.);
         let aabb_intersections = spatial_query.aabb_intersections_with_aabb(aabb);
         for entity in aabb_intersections.iter() {
             if ball_query.contains(*entity) {
-                next_state.set(AppState::GameOver);
+                next_state.set(GameState::GameOver);
             }
         }
     }

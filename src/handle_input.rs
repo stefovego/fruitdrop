@@ -17,16 +17,20 @@ pub enum Action {
     DropBall,
     ToggleTune,
     ToggleFps,
+    Pause,
 }
 
 impl Action {
     fn mk_input_map() -> InputMap<Self> {
-        InputMap::new([(Self::MoveLeft, KeyCode::ArrowLeft)])
-            .with(Self::MoveRight, KeyCode::ArrowRight)
-            .with(Self::DropBall, KeyCode::Space)
-            .with(Self::DropBall, MouseButton::Left)
-            .with(Self::ToggleTune, KeyCode::KeyT)
-            .with(Self::ToggleFps, KeyCode::KeyF)
+        InputMap::new([
+            (Self::MoveLeft, InputKind::PhysicalKey(KeyCode::ArrowLeft)),
+            (Self::MoveRight, InputKind::PhysicalKey(KeyCode::ArrowRight)),
+            (Self::DropBall, InputKind::PhysicalKey(KeyCode::Space)),
+            (Self::DropBall, InputKind::Mouse(MouseButton::Left)),
+            (Self::ToggleTune, InputKind::PhysicalKey(KeyCode::KeyT)),
+            (Self::ToggleFps, InputKind::PhysicalKey(KeyCode::KeyF)),
+            (Self::Pause, InputKind::PhysicalKey(KeyCode::Escape)),
+        ])
     }
 }
 

@@ -1,5 +1,5 @@
+use avian2d::prelude::*;
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
-use bevy_xpbd_2d::prelude::*;
 
 use crate::ball::components::*;
 use crate::ball::materials::BallMaterial;
@@ -11,7 +11,8 @@ const BALL_DENSITY: f32 = 30.;
 
 #[derive(Bundle)]
 pub struct BallBundle {
-    material_mesh_2d: MaterialMesh2dBundle<BallMaterial>,
+    material_mesh_2d: MaterialMesh2dBundle<ColorMaterial>,
+    //material_mesh_2d: MaterialMesh2dBundle<BallMaterial>,
     rigid_body: RigidBody,
     gravity_scale: GravityScale,
     collider: Collider,
@@ -23,7 +24,8 @@ pub struct BallBundle {
 }
 
 pub fn new(
-    materialmesh: MaterialMesh2dBundle<BallMaterial>,
+    materialmesh: MaterialMesh2dBundle<ColorMaterial>,
+    //materialmesh: MaterialMesh2dBundle<BallMaterial>,
     ball_type: BallType,
     ball_scaler: BallScaler,
 ) -> BallBundle {
@@ -43,7 +45,8 @@ pub fn new(
 }
 
 pub fn new_seed(
-    materialmesh: MaterialMesh2dBundle<BallMaterial>,
+    materialmesh: MaterialMesh2dBundle<ColorMaterial>,
+    //materialmesh: MaterialMesh2dBundle<BallMaterial>,
     ball_type: BallType,
     ball_scaler: BallScaler,
 ) -> BallBundle {

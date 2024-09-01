@@ -13,11 +13,11 @@ pub struct GameOverPlugin;
 impl Plugin for GameOverPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, trigger_gameover)
-            .add_systems(OnEnter(AppState::GameOver), setup)
-            .add_systems(OnExit(AppState::GameOver), tear_down)
+            .add_systems(OnEnter(GameState::GameOver), setup)
+            .add_systems(OnExit(GameState::GameOver), tear_down)
             .add_systems(
                 Update,
-                exit_gameover_screen.run_if(in_state(AppState::GameOver)),
+                exit_gameover_screen.run_if(in_state(GameState::GameOver)),
             );
     }
 }
@@ -28,19 +28,19 @@ fn tear_down(mut commands: Commands, gameover_query: Query<Entity, With<GameOver
     }
 }
 fn exit_gameover_screen(
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<GameState>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Enter) {
-        next_state.set(AppState::InGame);
+        next_state.set(GameState::Playing);
     }
 }
 fn trigger_gameover(
-    mut next_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<GameState>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::F6) {
-        next_state.set(AppState::GameOver);
+        next_state.set(GameState::GameOver);
     }
 }
 

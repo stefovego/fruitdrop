@@ -14,13 +14,13 @@ opt-level = 3
 [dependencies]
 nalgebra="^0.26"
 #bevy= { git = "https://github.com/bevyengine/bevy"}
-bevy = { version="0.14.0-rc.3"}
+bevy = "^0.14"
 #bevy_ecs = {version = "^0.14.0-rc.2", features=["serve"}
 #bevy-inspector-egui = "0.23"
-bevy_egui = { git = "https://github.com/Friz64/bevy_egui/", branch = "bevy-0.14" }
-bevy_xpbd_2d = {git = "https://github.com/Jondolf/bevy_xpbd", branch = "bevy-0.14", features = ["debug-plugin", "2d"] }
+bevy_egui = "0.28" 
+avian2d = "0.1"
 #leafwing-input-manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager", branch = "v0.14-rc" }
-leafwing-input-manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager"}
+leafwing-input-manager = "0.14"
 #noisy_bevy = "0.6"
 web-sys = { version = "0.3.67", features = ["Window"] }
 rand = "0.8.5"

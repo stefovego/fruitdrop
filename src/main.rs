@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 //use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use bevy_xpbd_2d::prelude::*;
+use avian2d::prelude::*;
 //use noisy_bevy::NoisyShaderPlugin;
 use web_sys;
 
@@ -40,6 +40,16 @@ mod physics;
 mod mygui;
 use mygui::*;
 
+mod menu;
+mod menus;
+mod pause;
+
+//mod states;
+
+use crate::menu::*;
+use crate::menus::*;
+use crate::pause::*;
+
 use crate::ball::plugin::BallPlugin;
 fn main() {
     App::new()
@@ -50,8 +60,10 @@ fn main() {
             }),
             ..default()
         }))
+        .init_state::<game_state::AppState>()
+        .init_state::<game_state::GameState>()
         //.add_plugins(NoisyShaderPlugin)
-        .add_plugins(PhysicsPlugins::default())
+        .add_plugins(PhysicsPlugins::default().with_length_unit(10.0))
         .add_plugins(handle_input::InputPlugin)
         //.add_plugins(PhysicsDebugPlugin::default())
         //.add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
@@ -67,6 +79,9 @@ fn main() {
         .add_plugins(GameOverPlugin)
         .add_plugins(MyGuiPlugin)
         .add_plugins(physics::PhysicsPlugin)
+        .add_plugins(main_menu::MainMenuPlugin)
+        .add_plugins(MenuPlugin)
+        .add_plugins(PausePlugin)
         .add_systems(Startup, update_canvas_size)
         //.add_systems(Startup, update_canvas_size.run_if(cfg!(target_arch = "wasm32")))
         .run();

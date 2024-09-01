@@ -1,7 +1,8 @@
-use crate::ball::{materials::BallMaterial, resources::*, systems::*};
-use crate::game_state::AppState;
 use bevy::prelude::*;
 use bevy::sprite::Material2dPlugin;
+
+use crate::ball::{materials::BallMaterial, resources::*, systems::*};
+use crate::game_state::GameState;
 
 pub struct BallPlugin;
 
@@ -20,16 +21,16 @@ impl Plugin for BallPlugin {
                 initial_multiplier: 0.3,
                 grow_speed: 0.7,
             })
-            .add_systems(Update, spawn_ball.run_if(in_state(AppState::InGame)))
+            .add_systems(Update, spawn_ball.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
-                ball_scaler_changed.run_if(in_state(AppState::InGame)),
+                ball_scaler_changed.run_if(in_state(GameState::Playing)),
             )
-            .add_systems(Update, fresh_balls.run_if(in_state(AppState::InGame)))
+            .add_systems(Update, fresh_balls.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
-                (seed_systems, handle_collisions, apply_deferred, grow_balls).chain(),
+                (seed_systems, handle_collisions, apply_deferred, grow_balls).chain().run_if(in_state(GameState::Playing)),
             )
-            .add_systems(OnExit(AppState::GameOver), tear_down);
+            .add_systems(OnExit(GameState::GameOver), tear_down);
     }
 }
