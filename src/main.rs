@@ -1,7 +1,7 @@
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-//use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use avian2d::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 //use noisy_bevy::NoisyShaderPlugin;
 use web_sys;
 
@@ -37,8 +37,8 @@ use gameover::*;
 mod ball;
 mod physics;
 
-mod mygui;
-use mygui::*;
+//mod mygui;
+//use mygui::*;
 
 mod menu;
 mod menus;
@@ -66,6 +66,7 @@ fn main() {
         .add_plugins(PhysicsPlugins::default().with_length_unit(10.0))
         .add_plugins(handle_input::InputPlugin)
         //.add_plugins(PhysicsDebugPlugin::default())
+        .add_plugins(WorldInspectorPlugin::new())
         //.add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
         .init_state::<AppState>()
         .add_plugins(BallPlugin)
@@ -77,9 +78,10 @@ fn main() {
         .add_plugins(FpsDisplayPlugin)
         .add_plugins(LoserBoxPlugin)
         .add_plugins(GameOverPlugin)
-        .add_plugins(MyGuiPlugin)
+        //       .add_plugins(MyGuiPlugin)
         .add_plugins(physics::PhysicsPlugin)
         .add_plugins(main_menu::MainMenuPlugin)
+        .add_plugins(pause_menu::PauseMenuPlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(PausePlugin)
         .add_systems(Startup, update_canvas_size)

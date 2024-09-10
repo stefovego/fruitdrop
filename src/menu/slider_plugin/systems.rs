@@ -111,7 +111,6 @@ pub fn selected_background(
     ) in &mut slider_query
     {
         if selected_ent == &entity {
-            info!("Slider Selected");
             *background_color = BackgroundColor(*selected_color);
         } else {
             *background_color = BackgroundColor(*unselected_color);

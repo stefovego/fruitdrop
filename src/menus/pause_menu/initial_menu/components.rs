@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct NewGameComponent;
-
-#[derive(Component)]
-pub struct OptionsComponent;
+pub struct UnpauseComponent;
 
 #[derive(Component)]
 pub struct QuitComponent;

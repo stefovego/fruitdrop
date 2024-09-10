@@ -16,8 +16,8 @@ nalgebra="^0.26"
 #bevy= { git = "https://github.com/bevyengine/bevy"}
 bevy = "^0.14"
 #bevy_ecs = {version = "^0.14.0-rc.2", features=["serve"}
-#bevy-inspector-egui = "0.23"
-bevy_egui = "0.28" 
+bevy-inspector-egui = "0.25"
+#bevy_egui = "0.28" 
 avian2d = "0.1"
 #leafwing-input-manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager", branch = "v0.14-rc" }
 leafwing-input-manager = "0.14"

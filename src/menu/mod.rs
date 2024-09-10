@@ -1,7 +1,8 @@
+use bevy::ecs::system::EntityCommand;
 use bevy::prelude::*;
 
-pub mod components;
 pub mod bundles;
+pub mod components;
 pub mod my_colors;
 pub mod navigation_button_plugin;
 pub mod selector_plugin;
@@ -26,3 +27,33 @@ impl Plugin for MenuPlugin {
             );
     }
 }
+
+pub struct InsertWidgetCommand(Entity);
+
+impl InsertWidgetCommand {
+    pub fn spawn(wiget_entity: Entity) -> Self
+where {
+        Self(wiget_entity)
+    }
+}
+
+impl EntityCommand for InsertWidgetCommand {
+    fn apply(self, parent_id: Entity, world: &mut World) {
+        world.entity_mut(parent_id).push_children(&[self.0]);
+    }
+}
+
+//fn init_menu_entity<T>(mut commands: Commands) {
+//    let parent_node = ScreenParentBundle::default();
+//
+//    let button_container_node = ContainerBundle::default();
+//
+//    let parent = commands
+//        .spawn((StateScoped(MainMenuState::InitialMenu), parent_node))
+//        .insert(MenuComponent)
+//        .id();
+//
+//    let button_container = commands.spawn(button_container_node).id();
+//
+//    commands.entity(parent).push_children(&[button_container]);
+//}

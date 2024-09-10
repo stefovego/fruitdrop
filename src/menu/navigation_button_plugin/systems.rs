@@ -1,7 +1,7 @@
 use crate::menu::components::*;
 use bevy::prelude::*;
 
-use super::{NavigationButtonComponent, SelectedColor, UnselectedColor};
+use super::{ButtonPushed, NavigationButtonComponent, SelectedColor, UnselectedColor};
 
 pub fn selected_background(
     mut item_query: Query<
@@ -47,7 +47,25 @@ pub fn mouse_system(
                 commands.entity(parent_entity).insert(SelectedEnt(entity));
             }
             Interaction::None => {}
-            Interaction::Pressed => {}
+            Interaction::Pressed => {
+                commands.trigger_targets(ButtonPushed, entity);
+            }
         }
+    }
+}
+
+pub fn keyboard_select(
+    keys: Res<ButtonInput<KeyCode>>,
+    parent_query: Query<&SelectedEnt, With<MenuComponent>>,
+    mut commands: Commands,
+) {
+    if parent_query.is_empty() {
+        return;
+    }
+
+    let SelectedEnt(currently_selected) = parent_query.single();
+
+    if keys.just_pressed(KeyCode::Enter) {
+        commands.trigger_targets(ButtonPushed, *currently_selected);
     }
 }

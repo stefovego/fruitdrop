@@ -4,12 +4,16 @@ use bevy::prelude::*;
 pub mod bundles;
 pub mod systems;
 
+use bevy::state::state::FreelyMutableState;
 use bundles::*;
 use systems::*;
 
 use crate::my_colors;
 
 pub struct NavigationButtonPlugin;
+
+#[derive(Event)]
+pub struct ButtonPushed;
 
 impl Plugin for NavigationButtonPlugin {
     fn build(&self, app: &mut App) {
@@ -20,42 +24,43 @@ impl Plugin for NavigationButtonPlugin {
         .add_systems(
             Update,
             selected_background.run_if(any_with_component::<NavigationButtonComponent>),
+        )
+        .add_systems(
+            Update,
+            keyboard_select.run_if(any_with_component::<NavigationButtonComponent>),
         );
     }
 }
-pub struct NavigationButton<T> {
+pub struct NavigationButton<T: States> {
     pub text: String,
-    pub marker_component: T,
     pub selected_color: Color,
     pub unselected_color: Color,
+    pub next_state: T,
 }
-pub struct SpawnNavigationButton<T> {
+
+pub struct SpawnNavigationButton<T: States> {
     pub navigation_button: NavigationButton<T>,
 }
 
-impl<T> SpawnNavigationButton<T> {
+impl<T: States> SpawnNavigationButton<T> {
     pub fn spawn(navigation_button: NavigationButton<T>) -> Self
-    where
-        T: Component,
-    {
+where {
         Self { navigation_button }
     }
 }
 
-impl<T> EntityCommand for SpawnNavigationButton<T>
-where
-    T: Component,
-{
+impl<T: FreelyMutableState> EntityCommand for SpawnNavigationButton<T> {
     fn apply(self, parent_id: Entity, world: &mut World) {
         let text_button_widget = world
-            .spawn(NavigationButtonBundle {
+            .entity_mut(parent_id)
+            .insert(NavigationButtonBundle {
                 selected_color: SelectedColor(self.navigation_button.selected_color),
                 unselected_color: UnselectedColor(self.navigation_button.unselected_color),
                 ..default()
             })
             .insert(BackgroundColor(self.navigation_button.unselected_color))
-            .insert(self.navigation_button.marker_component)
             .id();
+
         let text_button_label_widget = world
             .spawn(TextBundle::from_section(
                 self.navigation_button.text,
@@ -66,11 +71,13 @@ where
                 },
             ))
             .id();
+        world.entity_mut(text_button_widget).observe(
+            move |tigger: Trigger<ButtonPushed>, mut next_states: ResMut<NextState<T>>| {
+                next_states.set(self.navigation_button.next_state.clone());
+            },
+        );
         world
             .entity_mut(text_button_widget)
             .push_children(&[text_button_label_widget]);
-        world
-            .entity_mut(parent_id)
-            .push_children(&[text_button_widget]);
     }
 }

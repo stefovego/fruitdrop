@@ -46,17 +46,18 @@ pub struct Slider {
     pub track_color: Color,
 }
 
-pub struct SpawnSlider {
+pub struct SpawnSlider<T> {
     pub slider: Slider,
+    pub marker: T,
 }
 
-impl SpawnSlider {
-    pub fn spawn(slider: Slider) -> Self {
-        Self { slider }
+impl<T> SpawnSlider<T> {
+    pub fn spawn(slider: Slider, marker: T) -> Self {
+        Self { slider, marker }
     }
 }
 
-impl EntityCommand for SpawnSlider {
+impl<T: Component> EntityCommand for SpawnSlider<T> {
     fn apply(self, parent_id: Entity, world: &mut World) {
         let slider_widget = world
             .spawn(SliderWidgetBundle {
@@ -161,7 +162,8 @@ impl EntityCommand for SpawnSlider {
                 min: self.slider.min,
                 max: self.slider.max,
                 current_value: self.slider.initial_value,
-            });
+            })
+            .insert((self.marker));
         world.entity_mut(parent_id).push_children(&[slider_widget]);
     }
 }

@@ -5,15 +5,16 @@ mod game_menu;
 mod initial_menu;
 mod menu_state;
 mod options_menu;
+mod start_menu;
 mod video_menu;
 
-use self::game_menu::systems as game_menu_systems;
 use crate::menu::components::MenuComponent;
 use menu_state::MainMenuState;
 
 use self::game_menu::GameMenuPlugin;
 use self::initial_menu::InitialMenuPlugin;
 use self::options_menu::OptionsMenuPlugin;
+use self::start_menu::StartMenuPlugin;
 use self::video_menu::VideoMenuPlugin;
 
 pub struct MainMenuPlugin;
@@ -27,16 +28,8 @@ impl Plugin for MainMenuPlugin {
                 OptionsMenuPlugin,
                 VideoMenuPlugin,
                 GameMenuPlugin,
+                StartMenuPlugin,
             ))
-            //Tear Down Menus at exit
-            //.add_systems(OnExit(MainMenuState::OptionsMenu), teardown_menu)
-            //.add_systems(OnExit(MainMenuState::InitialMenu), teardown_menu)
-            //.add_systems(OnExit(MainMenuState::VideoMenu), teardown_menu)
-            //.add_systems(
-            //    OnExit(MainMenuState::GameMenu),
-            //    (game_menu_systems::exit_menu, teardown_menu).chain(),
-            //)
-            //This system closes the game
             .add_systems(OnEnter(menu_state::MainMenuState::QuitGame), quit_system);
     }
 }

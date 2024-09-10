@@ -79,12 +79,10 @@ pub fn show_selection(
             .get_many_mut([*off_button, *on_button])
             .unwrap();
         if !toggle_component.current_value {
-            println!("Toggle Off");
             *off_button_border = BorderColor(my_colors::ORANGE); //Orange
             *on_button_border = BorderColor(Color::NONE);
         }
         if toggle_component.current_value {
-            println!("Toggle On");
             *off_button_border = BorderColor(Color::NONE);
             *on_button_border = BorderColor(my_colors::ORANGE);
         }
@@ -108,7 +106,6 @@ pub fn on_click_toggle(
                     if let Ok(mut toggle_component) = toggle_button_query.get_mut(parent_entity) {
                         toggle_component.current_value = true;
                     }
-                    println!("Toggle Clicked");
                 }
             }
         }
