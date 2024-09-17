@@ -29,23 +29,25 @@ pub fn setup_menu(mut commands: Commands) {
     let button_container = commands.spawn(button_container_node).id();
     commands.entity(parent).push_children(&[button_container]);
 
-    commands
-        .entity(button_container)
+    let cool_toggle_entity = commands
+        .spawn_empty()
         .add(SpawnToggle::spawn(Toggle {
             initial_value: true,
             label: "Cool?".into(),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
-        }));
+        }))
+        .id();
 
-    commands
-        .entity(button_container)
+    let stuff_selector_entity = commands
+        .spawn_empty()
         .add(SpawnSelector::spawn(Selector {
             label: "Stuff".into(),
             selections: ["Stuff ONe".into(), "stuff 2".into(), "stuff3".into()].into(),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
-        }));
+        }))
+        .id();
 
     let back_button_entity = commands
         .spawn_empty()
@@ -57,7 +59,9 @@ pub fn setup_menu(mut commands: Commands) {
         }))
         .id();
 
-    commands
-        .entity(button_container)
-        .add_child(back_button_entity);
+    commands.entity(button_container).push_children(&[
+        cool_toggle_entity,
+        stuff_selector_entity,
+        back_button_entity,
+    ]);
 }

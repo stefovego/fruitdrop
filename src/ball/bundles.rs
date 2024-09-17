@@ -2,7 +2,7 @@ use avian2d::prelude::*;
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 use crate::ball::components::*;
-use crate::ball::materials::BallMaterial;
+//use crate::ball::materials::BallMaterial;
 use crate::ball::resources::BallScaler;
 use crate::ball::utils::*;
 

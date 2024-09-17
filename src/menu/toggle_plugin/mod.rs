@@ -58,7 +58,8 @@ impl SpawnToggle {
 impl EntityCommand for SpawnToggle {
     fn apply(self, parent_id: Entity, world: &mut World) {
         let toggle_widget = world
-            .spawn(ToggleWidgetBundle {
+            .entity_mut(parent_id)
+            .insert(ToggleWidgetBundle {
                 selected_color: SelectedColor(self.toggle.selected_color),
                 unselected_color: UnselectedColor(self.toggle.unselected_color),
                 ..default()
@@ -183,7 +184,5 @@ impl EntityCommand for SpawnToggle {
             })
             .insert(OnButtonEntity(on_button))
             .insert(OffButtonEntity(off_button));
-
-        world.entity_mut(parent_id).push_children(&[toggle_widget]);
     }
 }

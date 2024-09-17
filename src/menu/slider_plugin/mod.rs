@@ -60,7 +60,8 @@ impl<T> SpawnSlider<T> {
 impl<T: Component> EntityCommand for SpawnSlider<T> {
     fn apply(self, parent_id: Entity, world: &mut World) {
         let slider_widget = world
-            .spawn(SliderWidgetBundle {
+            .entity_mut(parent_id)
+            .insert(SliderWidgetBundle {
                 selected_color: SelectedColor(self.slider.selected_color),
                 unselected_color: UnselectedColor(self.slider.unselected_color),
                 ..default()
@@ -163,7 +164,6 @@ impl<T: Component> EntityCommand for SpawnSlider<T> {
                 max: self.slider.max,
                 current_value: self.slider.initial_value,
             })
-            .insert((self.marker));
-        world.entity_mut(parent_id).push_children(&[slider_widget]);
+            .insert(self.marker);
     }
 }

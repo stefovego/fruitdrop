@@ -65,7 +65,7 @@ fn main() {
         //.add_plugins(NoisyShaderPlugin)
         .add_plugins(PhysicsPlugins::default().with_length_unit(10.0))
         .add_plugins(handle_input::InputPlugin)
-        //.add_plugins(PhysicsDebugPlugin::default())
+        .add_plugins(PhysicsDebugPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
         //.add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
         .init_state::<AppState>()

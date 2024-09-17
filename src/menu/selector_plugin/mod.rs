@@ -30,7 +30,8 @@ impl Plugin for SelectorPlugin {
         .add_systems(
             Update,
             next_button_clicked.run_if(any_with_component::<SelectorWidgetComponent>),
-        ).add_systems(
+        )
+        .add_systems(
             Update,
             key_toggle.run_if(any_with_component::<SelectorWidgetComponent>),
         );
@@ -57,7 +58,8 @@ impl SpawnSelector {
 impl EntityCommand for SpawnSelector {
     fn apply(self, parent_id: Entity, world: &mut World) {
         let selection_widget = world
-            .spawn(SelectionWidgetBundle {
+            .entity_mut(parent_id)
+            .insert(SelectionWidgetBundle {
                 selected_color: SelectedColor(self.selector.selected_color),
                 unselected_color: UnselectedColor(self.selector.unselected_color),
                 ..default()
@@ -205,9 +207,5 @@ impl EntityCommand for SpawnSelector {
             .insert(PreviousButtonEntity(previous_button))
             .insert(NextButtonEntity(next_button))
             .insert(CurrentSelectionEntity(current_selection_label));
-
-        world
-            .entity_mut(parent_id)
-            .push_children(&[selection_widget]);
     }
 }
