@@ -5,7 +5,10 @@ use bevy::ui::RelativeCursorPosition;
 
 pub fn move_slider(
     keys: Res<ButtonInput<KeyCode>>,
-    mut slider_query: Query<(Entity, &mut SliderWidgetComponent), With<SliderWidgetComponent>>,
+    mut slider_query: Query<
+        (Entity, &mut SliderWidgetComponent<T>),
+        With<SliderWidgetComponent<T>>,
+    >,
     selected_query: Query<&SelectedEnt, With<MenuComponent>>,
 ) {
     if selected_query.is_empty() {
@@ -32,10 +35,10 @@ pub fn move_slider(
     }
 }
 
-pub fn place_knob(
+pub fn place_knob<T>(
     mut slider_query: Query<
         (
-            &mut SliderWidgetComponent,
+            &mut SliderWidgetComponent<T>,
             &SliderEntity,
             &SliderReadOutEntity,
         ),

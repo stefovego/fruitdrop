@@ -35,8 +35,8 @@ impl Plugin for SliderPlugin {
     }
 }
 
-pub struct Slider {
-    pub initial_value: u32,
+pub struct Slider<T> {
+    pub initial_value: T,
     pub step_size: u32,
     pub min: u32,
     pub max: u32,
@@ -46,18 +46,18 @@ pub struct Slider {
     pub track_color: Color,
 }
 
-pub struct SpawnSlider<T> {
-    pub slider: Slider,
+pub struct SpawnSlider<T, U> {
+    pub slider: Slider<U>,
     pub marker: T,
 }
 
-impl<T> SpawnSlider<T> {
-    pub fn spawn(slider: Slider, marker: T) -> Self {
+impl<T, U> SpawnSlider<T, U> {
+    pub fn spawn(slider: Slider<U>, marker: T) -> Self {
         Self { slider, marker }
     }
 }
 
-impl<T: Component> EntityCommand for SpawnSlider<T> {
+impl<T: Component, U: std::marker::Send + 'static> EntityCommand for SpawnSlider<T, U> {
     fn apply(self, parent_id: Entity, world: &mut World) {
         let slider_widget = world
             .entity_mut(parent_id)
@@ -165,5 +165,16 @@ impl<T: Component> EntityCommand for SpawnSlider<T> {
                 current_value: self.slider.initial_value,
             })
             .insert(self.marker);
+    }
+
+    fn with_entity(self, id: Entity) -> bevy::ecs::system::WithEntity<(), Self>
+    where
+        Self: Sized,
+    {
+        bevy::ecs::system::WithEntity {
+            cmd: self,
+            id,
+            marker: std::marker::PhantomData,
+        }
     }
 }

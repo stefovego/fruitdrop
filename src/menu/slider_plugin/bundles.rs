@@ -47,9 +47,9 @@ impl Default for SliderKnobBundle {
 }
 
 #[derive(Component)]
-pub struct SliderWidgetComponent {
+pub struct SliderWidgetComponent<T: std::marker::Send> {
     pub step_size: u32,
-    pub current_value: u32,
+    pub current_value: T,
     pub min: u32,
     pub max: u32,
 }
