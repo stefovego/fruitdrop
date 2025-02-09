@@ -1,8 +1,7 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 
 use crate::ball::{
     components::BallType,
-    materials::BallMaterial,
     resources::BallScaler,
     utils::{get_ball_stats, random_ball},
 };
@@ -68,121 +67,57 @@ fn spawn_deck(
     on_deck_ball.balltype = random_ball();
     // Spawn The Box Entity
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
-                custom_size: Some(Vec2 {
-                    x: BOX_WIDTH,
-                    y: BOX_THICKNESS,
-                }),
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3 {
-                    x: BOX_X,
-                    y: BOX_Y + BOX_HEIGHT / 2.,
-                    z: 0.,
-                },
-                ..default()
-            },
-            ..default()
-        },
+        Sprite::from_color(
+            Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
+            Vec2::new(BOX_WIDTH, BOX_THICKNESS),
+        ),
+        Transform::from_translation(Vec3::new(BOX_X, BOX_Y + BOX_HEIGHT / 2., 0.0)),
         OnDeckBox,
     ));
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
-                custom_size: Some(Vec2 {
-                    x: BOX_WIDTH,
-                    y: BOX_THICKNESS,
-                }),
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3 {
-                    x: BOX_X,
-                    y: BOX_Y - BOX_HEIGHT / 2.,
-                    z: 0.,
-                },
-                ..default()
-            },
-            ..default()
-        },
+        Sprite::from_color(
+            Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
+            Vec2::new(BOX_WIDTH, BOX_THICKNESS),
+        ),
+        Transform::from_translation(Vec3::new(BOX_X, BOX_Y - BOX_HEIGHT / 2., 0.)),
         OnDeckBox,
     ));
 
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
-                custom_size: Some(Vec2 {
-                    x: BOX_THICKNESS,
-                    y: BOX_HEIGHT,
-                }),
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3 {
-                    x: BOX_X + BOX_WIDTH / 2.,
-                    y: BOX_Y,
-                    z: 0.,
-                },
-                ..default()
-            },
-            ..default()
-        },
+        Sprite::from_color(
+            Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
+            Vec2::new(BOX_THICKNESS, BOX_HEIGHT),
+        ),
+        Transform::from_translation(Vec3::new(BOX_X + BOX_WIDTH / 2., BOX_Y, 0.)),
         OnDeckBox,
     ));
 
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
-                custom_size: Some(Vec2 {
-                    x: BOX_THICKNESS,
-                    y: BOX_HEIGHT,
-                }),
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3 {
-                    x: BOX_X - BOX_WIDTH / 2.,
-                    y: BOX_Y,
-                    z: 0.,
-                },
-                ..default()
-            },
-            ..default()
-        },
+        Sprite::from_color(
+            Color::linear_rgb(1.0, 0.38823529411764707, 0.2784313725490196), //orange
+            Vec2::new(BOX_THICKNESS, BOX_HEIGHT),
+        ),
+        Transform::from_translation(Vec3::new(BOX_X - BOX_WIDTH / 2., BOX_Y, 0.0)),
         OnDeckBox,
     ));
 
     let on_deck_entity = commands
-        .spawn(TransformBundle::from(Transform::from_xyz(
-            650.0, 250.0, 0.0,
-        )))
-        .insert(VisibilityBundle {
-            visibility: Visibility::Visible,
-            inherited_visibility: InheritedVisibility::VISIBLE,
-            ..Default::default()
-        })
-        .insert(OnDeck)
+        .spawn((
+            Transform::from_xyz(650.0, 250.0, 0.0),
+            InheritedVisibility::VISIBLE,
+            OnDeck,
+        ))
         .id();
 
     let ball = get_ball_stats(on_deck_ball.balltype);
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let on_deck_ball_entity = commands
-        .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Circle::new(ball_size)).into(),
-            material: materials.add(ColorMaterial::from_color(ball.color)),
-            // material: materials.add(BallMaterial {
-            //     color: ball.color.into(),
-            // }),
-            ..default()
-        })
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
-        .insert(OnDeckBallComponent)
+        .spawn((
+            Mesh2d(meshes.add(Circle::new(ball_size))),
+            MeshMaterial2d(materials.add(ColorMaterial::from_color(ball.color))),
+            Transform::from_xyz(0.0, 0., 1.),
+            OnDeckBallComponent,
+        ))
         .id();
 
     commands
@@ -207,17 +142,13 @@ fn on_deck_ball_change(
             let ball = get_ball_stats(on_deck_ball.balltype);
             let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
             let loadball_entity = commands
-                .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(Circle::new(ball_size)).into(),
-                    material: materials.add(ColorMaterial::from_color(ball.color)),
-                    // material: materials.add(BallMaterial {
-                    //     color: ball.color.into(),
-                    // }),
-                    ..default()
-                })
-                .insert(TransformBundle::from(Transform::from_xyz(0., 0., 1.)))
-                .insert(OnDeckBallComponent)
-                .insert(Name::new("OnDeck"))
+                .spawn((
+                    Mesh2d(meshes.add(Circle::new(ball_size))),
+                    MeshMaterial2d(materials.add(ColorMaterial::from_color(ball.color))),
+                    Transform::from_xyz(0., 0., 1.),
+                    OnDeckBallComponent,
+                    Name::new("OnDeck"),
+                ))
                 .id();
 
             commands.entity(parent.get()).add_child(loadball_entity);

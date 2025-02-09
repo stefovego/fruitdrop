@@ -42,11 +42,11 @@ pub fn setup_menu(
 
     let button_container = commands.spawn(button_container_node).id();
 
-    commands.entity(parent).push_children(&[button_container]);
+    commands.entity(parent).add_children(&[button_container]);
 
     let start_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Start Game"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -57,7 +57,7 @@ pub fn setup_menu(
 
     let ball_size_slider_entity = commands
         .spawn_empty()
-        .add(SpawnSlider::spawn(
+        .queue(SpawnSlider::spawn(
             Slider {
                 label: "Smallest Ball Size".into(),
                 initial_value: ball_scaler.initial_size as u32,
@@ -74,7 +74,7 @@ pub fn setup_menu(
 
     let grow_speed_slider_entity = commands
         .spawn_empty()
-        .add(SpawnSlider::spawn(
+        .queue(SpawnSlider::spawn(
             Slider {
                 label: "Grow Speed".into(),
                 initial_value: grow_stats.grow_speed as u32,
@@ -91,7 +91,7 @@ pub fn setup_menu(
 
     let back_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Back"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -99,7 +99,7 @@ pub fn setup_menu(
         }))
         .id();
 
-    commands.entity(button_container).push_children(&[
+    commands.entity(button_container).add_children(&[
         start_button_entity,
         ball_size_slider_entity,
         grow_speed_slider_entity,

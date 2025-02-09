@@ -38,7 +38,7 @@ fn update_scoreboard(
     if player_score.is_changed() {
         for mut text in &mut score_text_query {
             let value = player_score.value;
-            text.sections[0].value = format!("{value:.2}");
+            text.0 = format!("{value:.2}");
         }
     }
 }
@@ -50,25 +50,17 @@ fn spawn_scoreboard(
 ) {
     player_score.value = 0;
     commands.spawn((
-        Text2dBundle {
-            text: Text::from_section(
-                player_score.value.to_string(),
-                TextStyle {
-                    font: asset_server.load("fonts/Roboto-Black.ttf"),
-                    font_size: 60.,
-                    ..default()
-                },
-            ),
-            transform: Transform {
-                translation: Vec3 {
-                    x: SCORE_BOARD_X,
-                    y: SCORE_BOARD_Y,
-                    z: 1.,
-                },
-                ..default()
-            },
+        Text::new(player_score.value.to_string()),
+        TextFont {
+            font: asset_server.load("fonts/Roboto-Black.ttf"),
+            font_size: 60.,
             ..default()
         },
+        Transform::from_translation(Vec3 {
+            x: SCORE_BOARD_X,
+            y: SCORE_BOARD_Y,
+            z: 1.,
+        }),
         Score,
         Name::new("scoreboard"),
     ));

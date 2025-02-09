@@ -27,32 +27,29 @@ pub struct ToggleWidgetComponent {
 
 #[derive(Bundle)]
 pub struct ToggleButtonBundle {
-    pub button: ButtonBundle,
-    //pub background_color: BackgroundColor,
+    pub button: Node,
+    pub background_color: BackgroundColor,
+    pub border_color: BorderColor,
 }
 impl Default for ToggleButtonBundle {
     fn default() -> Self {
         Self {
-            button: ButtonBundle {
-                style: Style {
-                    border: UiRect {
-                        left: Val::Px(2.0),
-                        right: Val::Px(2.0),
-                        top: Val::Px(2.0),
-                        bottom: Val::Px(2.0),
-                    },
-                    width: Val::Px(90.0),
-                    height: Val::Px(90.0),
-                    align_self: AlignSelf::Center,
-                    justify_content: JustifyContent::Center,
-                    ..default()
+            button: Node {
+                border: UiRect {
+                    left: Val::Px(2.0),
+                    right: Val::Px(2.0),
+                    top: Val::Px(2.0),
+                    bottom: Val::Px(2.0),
                 },
+                width: Val::Px(90.0),
+                height: Val::Px(90.0),
+                align_self: AlignSelf::Center,
+                justify_content: JustifyContent::Center,
 
-                background_color: BackgroundColor(my_colors::PURPLE),
-                border_color: Color::NONE.into(),
                 ..default()
             },
-            // background_color: BackgroundColor(my_colors::PURPLE),
+            background_color: BackgroundColor(my_colors::PURPLE),
+            border_color: Color::NONE.into(),
         }
     }
 }
@@ -93,7 +90,7 @@ impl Default for OnToggleBundle {
 
 #[derive(Bundle)]
 pub struct ToggleWidgetBundle {
-    pub node: ButtonBundle,
+    pub node: Node,
     pub selectables: Selectables,
     pub selected_color: SelectedColor,
     pub unselected_color: UnselectedColor,
@@ -104,19 +101,16 @@ impl Default for ToggleWidgetBundle {
     fn default() -> Self {
         Self {
             selectables: Selectables,
-            node: ButtonBundle {
-                style: Style {
-                    height: Val::Percent(30.0),
-                    width: Val::Percent(100.0),
-                    align_self: AlignSelf::Center,
-                    justify_self: JustifySelf::Center,
-                    margin: UiRect {
-                        bottom: Val::Px(10.0),
-                        ..default()
-                    },
-                    display: Display::Flex,
+            node: Node {
+                height: Val::Percent(30.0),
+                width: Val::Percent(100.0),
+                align_self: AlignSelf::Center,
+                justify_self: JustifySelf::Center,
+                margin: UiRect {
+                    bottom: Val::Px(10.0),
                     ..default()
                 },
+                display: Display::Flex,
                 ..default()
             },
             selected_color: SelectedColor(Color::NONE),
@@ -128,22 +122,19 @@ impl Default for ToggleWidgetBundle {
 
 #[derive(Bundle)]
 pub struct ToggleContainerBundle {
-    node: NodeBundle,
+    node: Node,
 }
 
 impl Default for ToggleContainerBundle {
     fn default() -> Self {
         Self {
-            node: NodeBundle {
-                style: Style {
-                    position_type: PositionType::Relative,
-                    align_self: AlignSelf::Center,     // vertical
-                    justify_self: JustifySelf::Center, //horizontal
-                    height: Val::Percent(100.0),
-                    width: Val::Percent(100.0),
-                    display: Display::Flex,
-                    ..default()
-                },
+            node: Node {
+                position_type: PositionType::Relative,
+                align_self: AlignSelf::Center,     // vertical
+                justify_self: JustifySelf::Center, //horizontal
+                height: Val::Percent(100.0),
+                width: Val::Percent(100.0),
+                display: Display::Flex,
                 ..default()
             },
         }

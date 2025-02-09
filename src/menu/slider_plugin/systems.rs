@@ -5,10 +5,7 @@ use bevy::ui::RelativeCursorPosition;
 
 pub fn move_slider(
     keys: Res<ButtonInput<KeyCode>>,
-    mut slider_query: Query<
-        (Entity, &mut SliderWidgetComponent<T>),
-        With<SliderWidgetComponent<T>>,
-    >,
+    mut slider_query: Query<(Entity, &mut SliderWidgetComponent), With<SliderWidgetComponent>>,
     selected_query: Query<&SelectedEnt, With<MenuComponent>>,
 ) {
     if selected_query.is_empty() {
@@ -30,21 +27,21 @@ pub fn move_slider(
                 slider_component.current_value + slider_component.step_size,
                 0,
                 slider_component.max,
-            );
+            )
         }
     }
 }
 
-pub fn place_knob<T>(
+pub fn place_knob(
     mut slider_query: Query<
         (
-            &mut SliderWidgetComponent<T>,
+            &mut SliderWidgetComponent,
             &SliderEntity,
             &SliderReadOutEntity,
         ),
         With<SliderWidgetComponent>,
     >,
-    mut knob_query: Query<&mut Style, With<SliderKnob>>,
+    mut knob_query: Query<&mut Node, With<SliderKnob>>,
     mut readout_query: Query<&mut Text, With<ReadOut>>,
 ) {
     for (slider_component, SliderEntity(slider_entity), SliderReadOutEntity(readout_entity)) in
@@ -59,7 +56,7 @@ pub fn place_knob<T>(
             }
         }
         if let Ok(mut readout_text) = readout_query.get_mut(*readout_entity) {
-            readout_text.sections[0].value = format!("{}", slider_component.current_value);
+            readout_text.0 = format!("{}", slider_component.current_value);
         }
     }
 }

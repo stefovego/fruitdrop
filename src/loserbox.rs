@@ -1,6 +1,5 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
-use bevy::sprite::MaterialMesh2dBundle;
 
 use crate::ball::components::{Ball, FreshBall};
 use crate::game_state::GameState;
@@ -41,7 +40,10 @@ fn tear_down(mut commands: Commands, loser_box_query: Query<Entity, With<LoserBo
 fn danger_warning(
     mut commands: Commands,
     ball_query: Query<&Transform, (With<Ball>, Without<FreshBall>)>,
-    warning_query: Query<(Entity, &Handle<ColorMaterial>, &DangerWarning), With<DangerWarning>>,
+    warning_query: Query<
+        (Entity, &MeshMaterial2d<ColorMaterial>, &DangerWarning),
+        With<DangerWarning>,
+    >,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let mut danger_amount: f32 = 0.;
@@ -59,10 +61,10 @@ fn danger_warning(
     for (warning_entity, _warning_color, danger_bar) in &warning_query {
         commands
             .entity(warning_entity)
-            .insert(materials.add(ColorMaterial {
+            .insert(MeshMaterial2d(materials.add(ColorMaterial {
                 color: danger_bar.color.with_alpha(danger_amount),
                 ..default()
-            }));
+            })));
     }
 }
 
@@ -90,29 +92,20 @@ fn setup(
 ) {
     commands.spawn((
         Collider::rectangle(WIDTH, HEIGHT),
-        TransformBundle::from(Transform::from_xyz(0., BORDER_HEIGHT, 0.)),
+        Transform::from_xyz(0., BORDER_HEIGHT, 0.),
         Sensor,
         LoserBox,
         Name::new("LoserBox"),
     ));
 
-    commands
-        .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Rectangle::new(WIDTH, 10.)).into(),
-            material: materials.add(ColorMaterial::from_color(Color::linear_rgb(1.0, 0.0, 0.0))),
-            transform: Transform {
-                translation: Vec3::new(0., BORDER_HEIGHT, 1.0),
-                ..default()
-            },
-            ..default()
-        })
-        .insert(TransformBundle::from(Transform::from_xyz(
-            0.0,
-            BORDER_HEIGHT,
-            0.0,
-        )))
-        .insert(DangerWarning {
+    commands.spawn((
+        Mesh2d(meshes.add(Rectangle::new(WIDTH, 10.))),
+        MeshMaterial2d(materials.add(ColorMaterial::from_color(Color::linear_rgb(1.0, 0.0, 0.0)))),
+        Transform::from_translation(Vec3::new(0., BORDER_HEIGHT, 1.0)),
+        //Transform::from_xyz(0.0, BORDER_HEIGHT, 0.0),
+        DangerWarning {
             color: Color::linear_rgb(1.0, 0.0, 0.0),
-        })
-        .insert(Name::new("danger_warning"));
+        },
+        Name::new("danger_warning"),
+    ));
 }

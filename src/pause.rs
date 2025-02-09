@@ -11,11 +11,11 @@ impl Plugin for PausePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            pause_game.run_if(in_state(AppState::InGame).and_then(in_state(GameState::Playing))),
+            pause_game.run_if(in_state(AppState::InGame).and(in_state(GameState::Playing))),
         )
         .add_systems(
             Update,
-            unpause_game.run_if(in_state(AppState::InGame).and_then(in_state(GameState::Paused))),
+            unpause_game.run_if(in_state(AppState::InGame).and(in_state(GameState::Paused))),
         );
     }
 }

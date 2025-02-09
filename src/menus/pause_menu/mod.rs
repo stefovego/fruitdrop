@@ -3,7 +3,6 @@ use bevy::prelude::*;
 mod initial_menu;
 
 mod menu_state;
-use crate::game_state::AppState;
 use crate::game_state::GameState;
 use menu_state::PauseMenuState;
 

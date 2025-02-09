@@ -30,11 +30,11 @@ pub fn setup_menu(mut commands: Commands) {
 
     let button_container = commands.spawn(button_container_node).id();
 
-    commands.entity(parent).push_children(&[button_container]);
+    commands.entity(parent).add_children(&[button_container]);
 
     let unpause_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Unpause"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -43,7 +43,7 @@ pub fn setup_menu(mut commands: Commands) {
         .id();
     let quit_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Quit"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -53,7 +53,7 @@ pub fn setup_menu(mut commands: Commands) {
         .id();
     commands
         .entity(button_container)
-        .push_children(&[unpause_button_entity, quit_button_entity]);
+        .add_children(&[unpause_button_entity, quit_button_entity]);
 }
 
 pub fn quit_button_observer(

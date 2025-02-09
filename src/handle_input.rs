@@ -23,13 +23,13 @@ pub enum Action {
 impl Action {
     fn mk_input_map() -> InputMap<Self> {
         InputMap::new([
-            (Self::MoveLeft, InputKind::PhysicalKey(KeyCode::ArrowLeft)),
-            (Self::MoveRight, InputKind::PhysicalKey(KeyCode::ArrowRight)),
-            (Self::DropBall, InputKind::PhysicalKey(KeyCode::Space)),
-            (Self::DropBall, InputKind::Mouse(MouseButton::Left)),
-            (Self::ToggleTune, InputKind::PhysicalKey(KeyCode::KeyT)),
-            (Self::ToggleFps, InputKind::PhysicalKey(KeyCode::KeyF)),
-            (Self::Pause, InputKind::PhysicalKey(KeyCode::Escape)),
+            (Self::MoveLeft, KeyCode::ArrowLeft),
+            (Self::MoveRight, KeyCode::ArrowRight),
+            (Self::DropBall, KeyCode::Space),
+            //(Self::DropBall, MouseButton::Left),
+            (Self::ToggleTune, KeyCode::KeyT),
+            (Self::ToggleFps, KeyCode::KeyF),
+            (Self::Pause, KeyCode::Escape),
         ])
     }
 }

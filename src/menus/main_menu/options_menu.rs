@@ -27,11 +27,11 @@ pub fn setup_menu(mut commands: Commands) {
 
     let button_container = commands.spawn(button_container_node).id();
 
-    commands.entity(parent).push_children(&[button_container]);
+    commands.entity(parent).add_children(&[button_container]);
 
     let video_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Video"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -41,7 +41,7 @@ pub fn setup_menu(mut commands: Commands) {
 
     let game_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Game"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -51,7 +51,7 @@ pub fn setup_menu(mut commands: Commands) {
 
     let back_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Back"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -59,7 +59,7 @@ pub fn setup_menu(mut commands: Commands) {
         }))
         .id();
 
-    commands.entity(button_container).push_children(&[
+    commands.entity(button_container).add_children(&[
         video_button_entity,
         game_button_entity,
         back_button_entity,

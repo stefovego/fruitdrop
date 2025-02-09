@@ -39,7 +39,7 @@ where {
 
 impl EntityCommand for InsertWidgetCommand {
     fn apply(self, parent_id: Entity, world: &mut World) {
-        world.entity_mut(parent_id).push_children(&[self.0]);
+        world.entity_mut(parent_id).add_children(&[self.0]);
     }
 }
 
@@ -55,5 +55,5 @@ impl EntityCommand for InsertWidgetCommand {
 //
 //    let button_container = commands.spawn(button_container_node).id();
 //
-//    commands.entity(parent).push_children(&[button_container]);
+//    commands.entity(parent).add_children(&[button_container]);
 //}

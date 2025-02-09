@@ -69,27 +69,25 @@ impl EntityCommand for SpawnToggle {
             .id();
 
         let middle_spacer = world
-            .spawn(NodeBundle {
-                style: Style {
+            .spawn((
+                Node {
                     width: Val::Percent(40.0),
                     ..default()
                 },
-                ..default()
-            })
-            .insert(Name::new("Middle Spacer"))
+                Name::new("Middle Spacer"),
+            ))
             .id();
 
         let buttons_container = world
-            .spawn(NodeBundle {
-                style: Style {
+            .spawn((
+                Node {
                     width: Val::Percent(25.0),
                     column_gap: Val::Px(10.0),
                     justify_content: JustifyContent::SpaceEvenly,
                     ..default()
                 },
-                ..default()
-            })
-            .insert(Name::new("Buttons Container"))
+                Name::new("Buttons Container"),
+            ))
             .id();
 
         let off_button = world
@@ -98,18 +96,18 @@ impl EntityCommand for SpawnToggle {
             .id();
 
         let off_label = world
-            .spawn(TextBundle::from_section(
-                "Off",
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new("Off"),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
+                TextColor(Color::BLACK),
             ))
-            .insert(Style {
-                align_self: AlignSelf::Center,
-                ..default()
-            })
+            // .insert(Style {
+            //     align_self: AlignSelf::Center,
+            //     ..default()
+            // })
             .insert(Name::new("Off Label"))
             .id();
 
@@ -119,43 +117,42 @@ impl EntityCommand for SpawnToggle {
             .id();
 
         let on_label = world
-            .spawn(TextBundle::from_section(
-                "On",
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new("On"),
+                TextColor(Color::BLACK),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
-            .insert(Style {
-                align_self: AlignSelf::Center,
-                ..default()
-            })
+            // .insert(Style {
+            //     align_self: AlignSelf::Center,
+            //     ..default()
+            // })
             .insert(Name::new("On Label"))
             .id();
 
         let toggle_label = world
-            .spawn(TextBundle::from_section(
-                self.toggle.label,
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new(self.toggle.label),
+                TextColor(Color::BLACK),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
             .id();
 
         let toggle_label_container = world
-            .spawn(NodeBundle {
-                style: Style {
+            .spawn((
+                Node {
                     width: Val::Percent(35.0),
                     justify_content: JustifyContent::Start,
                     align_items: AlignItems::Center,
                     ..default()
                 },
-                ..default()
-            })
-            .insert(Name::new("Label Container"))
+                Name::new("Label Container"),
+            ))
             .id();
 
         world.entity_mut(off_button).add_child(off_label);

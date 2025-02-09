@@ -1,8 +1,7 @@
 use avian2d::prelude::*;
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 
 use crate::ball::components::*;
-//use crate::ball::materials::BallMaterial;
 use crate::ball::resources::BallScaler;
 use crate::ball::utils::*;
 
@@ -11,8 +10,6 @@ const BALL_DENSITY: f32 = 30.;
 
 #[derive(Bundle)]
 pub struct BallBundle {
-    material_mesh_2d: MaterialMesh2dBundle<ColorMaterial>,
-    //material_mesh_2d: MaterialMesh2dBundle<BallMaterial>,
     rigid_body: RigidBody,
     gravity_scale: GravityScale,
     collider: Collider,
@@ -23,16 +20,10 @@ pub struct BallBundle {
     ball: Ball,
 }
 
-pub fn new(
-    materialmesh: MaterialMesh2dBundle<ColorMaterial>,
-    //materialmesh: MaterialMesh2dBundle<BallMaterial>,
-    ball_type: BallType,
-    ball_scaler: BallScaler,
-) -> BallBundle {
+pub fn new(ball_type: BallType, ball_scaler: BallScaler) -> BallBundle {
     let balldata = get_ball_stats(ball_type);
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
     BallBundle {
-        material_mesh_2d: materialmesh,
         rigid_body: RigidBody::Dynamic,
         collider: Collider::circle(ball_size),
         collision_layer: CollisionLayers::new([Layer::Ball], [Layer::Ball, Layer::Wall]),
@@ -44,16 +35,10 @@ pub fn new(
     }
 }
 
-pub fn new_seed(
-    materialmesh: MaterialMesh2dBundle<ColorMaterial>,
-    //materialmesh: MaterialMesh2dBundle<BallMaterial>,
-    ball_type: BallType,
-    ball_scaler: BallScaler,
-) -> BallBundle {
+pub fn new_seed(ball_type: BallType, ball_scaler: BallScaler) -> BallBundle {
     let balldata = get_ball_stats(ball_type);
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
     BallBundle {
-        material_mesh_2d: materialmesh,
         rigid_body: RigidBody::Dynamic,
         collider: Collider::circle(ball_size),
         collision_layer: CollisionLayers::new([Layer::NotBall], [Layer::Ball, Layer::Wall]),

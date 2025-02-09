@@ -62,22 +62,22 @@ impl<T: FreelyMutableState> EntityCommand for SpawnNavigationButton<T> {
             .id();
 
         let text_button_label_widget = world
-            .spawn(TextBundle::from_section(
-                self.navigation_button.text,
-                TextStyle {
-                    color: my_colors::PINK,
+            .spawn((
+                Text::new(self.navigation_button.text),
+                TextColor(my_colors::PINK),
+                TextFont {
                     font_size: 100.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
             .id();
         world.entity_mut(text_button_widget).observe(
-            move |tigger: Trigger<ButtonPushed>, mut next_states: ResMut<NextState<T>>| {
+            move |_tigger: Trigger<ButtonPushed>, mut next_states: ResMut<NextState<T>>| {
                 next_states.set(self.navigation_button.next_state.clone());
             },
         );
         world
             .entity_mut(text_button_widget)
-            .push_children(&[text_button_label_widget]);
+            .add_children(&[text_button_label_widget]);
     }
 }

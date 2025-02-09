@@ -70,7 +70,7 @@ pub fn show_selection(
 ) {
     for (CurrentSelectionEntity(current_selection), selector_component) in &selection_entity_query {
         let mut selection_text = text_query.get_mut(*current_selection).unwrap();
-        selection_text.sections[0].value =
+        selection_text.0 =
             selector_component.selections[selector_component.current_index as usize].clone();
     }
 }

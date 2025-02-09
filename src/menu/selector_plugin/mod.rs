@@ -69,24 +69,18 @@ impl EntityCommand for SpawnSelector {
             .id();
 
         let middle_spacer = world
-            .spawn(NodeBundle {
-                style: Style {
-                    width: Val::Percent(20.0),
-                    ..default()
-                },
+            .spawn(Node {
+                width: Val::Percent(20.0),
                 ..default()
             })
             .insert(Name::new("Middle Spacer"))
             .id();
 
         let selection_container = world
-            .spawn(NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    column_gap: Val::Px(10.0),
-                    justify_content: JustifyContent::SpaceEvenly,
-                    ..default()
-                },
+            .spawn(Node {
+                width: Val::Percent(100.0),
+                column_gap: Val::Px(10.0),
+                justify_content: JustifyContent::SpaceEvenly,
                 ..default()
             })
             .insert(Name::new("Selection Container"))
@@ -98,18 +92,18 @@ impl EntityCommand for SpawnSelector {
             .id();
 
         let previous_label = world
-            .spawn(TextBundle::from_section(
-                "<",
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new("<"),
+                TextColor(Color::BLACK),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
-            .insert(Style {
-                align_self: AlignSelf::Center,
-                ..default()
-            })
+            // .insert(Style {
+            //     align_self: AlignSelf::Center,
+            //     ..default()
+            // })
             .insert(Name::new("Previous Label"))
             .id();
 
@@ -119,61 +113,60 @@ impl EntityCommand for SpawnSelector {
             .id();
 
         let next_label = world
-            .spawn(TextBundle::from_section(
-                ">",
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new(">"),
+                TextColor(Color::BLACK),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
-            .insert(Style {
-                align_self: AlignSelf::Center,
-                ..default()
-            })
+            //.insert(Style {
+            //    align_self: AlignSelf::Center,
+            //    ..default()
+            //})
             .insert(Name::new("Next Button Label"))
             .id();
 
         let current_selection = world.spawn(CurrentSelectionBundle { ..default() }).id();
 
         let current_selection_label = world
-            .spawn(TextBundle::from_section(
-                self.selector.selections.first().unwrap(),
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new(self.selector.selections.first().unwrap()),
+                TextColor(Color::BLACK),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
-            .insert(Style {
-                align_self: AlignSelf::Center,
-                ..default()
-            })
+            // .insert(Style {
+            //     align_self: AlignSelf::Center,
+            //     ..default()
+            // })
             .insert(Name::new("Current Selection Label"))
             .id();
 
         let label = world
-            .spawn(TextBundle::from_section(
-                self.selector.label,
-                TextStyle {
-                    color: Color::BLACK,
+            .spawn((
+                Text::new(self.selector.label),
+                TextColor(Color::BLACK),
+                TextFont {
                     font_size: 50.0,
-                    ..default()
+                    ..Default::default()
                 },
             ))
             .id();
 
         let label_container = world
-            .spawn(NodeBundle {
-                style: Style {
+            .spawn((
+                Node {
                     width: Val::Percent(35.0),
                     justify_content: JustifyContent::Start,
                     align_items: AlignItems::Center,
                     ..default()
                 },
-                ..default()
-            })
-            .insert(Name::new("Label Container"))
+                Name::new("Label Container"),
+            ))
             .id();
 
         world.entity_mut(previous_button).add_child(previous_label);

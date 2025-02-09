@@ -12,7 +12,7 @@ pub struct UnselectedColor(pub Color);
 
 #[derive(Bundle)]
 pub struct NavigationButtonBundle {
-    pub node: ButtonBundle,
+    pub node: Node,
     pub selectables: Selectables,
     pub navigation_button: NavigationButtonComponent,
     pub selected_color: SelectedColor,
@@ -22,14 +22,11 @@ pub struct NavigationButtonBundle {
 impl Default for NavigationButtonBundle {
     fn default() -> Self {
         Self {
-            node: ButtonBundle {
-                style: Style {
-                    width: Val::Percent(60.0),
-                    justify_content: JustifyContent::Center,
-                    margin: UiRect {
-                        bottom: Val::Px(10.0),
-                        ..default()
-                    },
+            node: Node {
+                width: Val::Percent(60.0),
+                justify_content: JustifyContent::Center,
+                margin: UiRect {
+                    bottom: Val::Px(10.0),
                     ..default()
                 },
                 ..default()

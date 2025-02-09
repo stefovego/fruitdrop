@@ -31,7 +31,7 @@ fn update_fps_display(
     for mut text in &mut score_text_query {
         if let Some(fps) = diagnostic.get(&FrameTimeDiagnosticsPlugin::FPS) {
             if let Some(value) = fps.smoothed() {
-                text.sections[1].value = format!("{value:.2}");
+                text.0 = format!("{value:.2}");
             }
         }
     }
@@ -53,34 +53,23 @@ fn toggle_display(
 
 fn spawn_fps_display(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
-        Text2dBundle {
-            text: Text::from_sections([
-                TextSection::new(
-                    "FPS: ",
-                    TextStyle {
-                        font: asset_server.load("fonts/Roboto-Black.ttf"),
-                        font_size: 60.,
-                        ..default()
-                    },
-                ),
-                TextSection::from_style(TextStyle {
-                    font: asset_server.load("fonts/Roboto-Black.ttf"),
-                    font_size: 60.,
-                    ..default()
-                }),
-            ]),
-            transform: Transform {
-                translation: Vec3 {
-                    x: FPS_DISPLAY_X,
-                    y: FPS_DISPLAY_Y,
-                    z: 1.,
-                },
-
-                ..default()
-            },
-            visibility: Visibility::Hidden,
+        Text::new("FPS: "),
+        TextFont {
+            font: asset_server.load("fonts/Roboto-Black.ttf"),
+            font_size: 60.,
             ..default()
         },
+        // TextSection::from_style(TextStyle {
+        //     font: asset_server.load("fonts/Roboto-Black.ttf"),
+        //     font_size: 60.,
+        //     ..default()
+        // }),
+        Transform::from_translation(Vec3 {
+            x: FPS_DISPLAY_X,
+            y: FPS_DISPLAY_Y,
+            z: 1.,
+        }),
+        Visibility::Hidden,
         FpsDisplay,
         Name::new("fps_display"),
     ));

@@ -32,11 +32,11 @@ pub fn setup_menu(mut commands: Commands) {
         .insert(Name::new("Button Container"))
         .id();
 
-    commands.entity(parent).push_children(&[button_container]);
+    commands.entity(parent).add_children(&[button_container]);
 
     let new_game_buttom_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("New Game"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -46,7 +46,7 @@ pub fn setup_menu(mut commands: Commands) {
 
     let options_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Options"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -56,7 +56,7 @@ pub fn setup_menu(mut commands: Commands) {
 
     let quit_button_entity = commands
         .spawn_empty()
-        .add(SpawnNavigationButton::spawn(NavigationButton {
+        .queue(SpawnNavigationButton::spawn(NavigationButton {
             text: String::from("Quit"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
@@ -64,7 +64,7 @@ pub fn setup_menu(mut commands: Commands) {
         }))
         .id();
 
-    commands.entity(button_container).push_children(&[
+    commands.entity(button_container).add_children(&[
         new_game_buttom_entity,
         options_button_entity,
         quit_button_entity,

@@ -58,12 +58,17 @@ fn loaded_ball_change(
             let ball = get_ball_stats(loaded_ball.balltype);
             let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
             let loadball_entity = commands
-                .spawn(MaterialMesh2dBundle {
-                    mesh: meshes.add(Circle::new(ball_size)).into(),
-                    material: materials.add(ColorMaterial::from_color(ball.color)),
-                    ..default()
-                })
-                .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
+                //.spawn(MaterialMesh2dBundle {
+                //    mesh: meshes.add(Circle::new(ball_size)).into(),
+                //    material: materials.add(ColorMaterial::from_color(ball.color)),
+                //    ..default()
+                //})
+                .spawn((
+                    Mesh2d(meshes.add(Circle::new(ball_size))),
+                    MeshMaterial2d(materials.add(ColorMaterial::from_color(ball.color))),
+                    Transform::from_xyz(0.0, 0., 1.),
+                ))
+                // .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
                 .insert(LoadedBallComponent)
                 .id();
 
@@ -82,25 +87,29 @@ fn spawn_dropper(
 
     // Spawn The Dropper Entity itself
     let droper_entity = commands
-        .spawn(TransformBundle::from(Transform::from_xyz(0.0, 400.0, 0.0)))
-        .insert(Name::new("Dropper"))
-        .insert(VisibilityBundle {
-            visibility: Visibility::Visible,
-            inherited_visibility: InheritedVisibility::VISIBLE,
-            ..Default::default()
-        })
-        .insert(Dropper)
+        .spawn((
+            Transform::from_xyz(0.0, 400.0, 0.0),
+            Name::new("Dropper"),
+            Visibility::Visible,
+            InheritedVisibility::VISIBLE,
+            Dropper,
+        ))
         .id();
 
     let ball = get_ball_stats(loaded_ball.balltype);
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
     let loadball_entity = commands
-        .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Circle::new(ball_size)).into(),
-            material: materials.add(ColorMaterial::from_color(ball.color)),
-            ..default()
-        })
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
+        // .spawn(MaterialMesh2dBundle {
+        //     mesh: meshes.add(Circle::new(ball_size)).into(),
+        //     material: materials.add(ColorMaterial::from_color(ball.color)),
+        //     ..default()
+        // })
+        .spawn((
+            Mesh2d(meshes.add(Circle::new(ball_size))),
+            MeshMaterial2d(materials.add(ColorMaterial::from_color(ball.color))),
+            Transform::from_xyz(0.0, 0., 1.),
+        ))
+        // .insert(TransformBundle::from(Transform::from_xyz(0.0, 0., 1.)))
         .insert(LoadedBallComponent)
         .id();
 
@@ -128,7 +137,7 @@ fn dropper_movement(
             direction = direction.normalize();
         }
 
-        transform.translation += direction * dropper_stats.speed * time.delta_seconds();
+        transform.translation += direction * dropper_stats.speed * time.delta_secs();
     }
 }
 

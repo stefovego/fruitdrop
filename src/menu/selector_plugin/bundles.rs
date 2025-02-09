@@ -30,27 +30,23 @@ pub struct SelectorWidgetComponent {
 
 #[derive(Bundle)]
 pub struct ChangeButtonBundle {
-    pub button: ButtonBundle,
+    pub node: Node,
     //    pub background_color: BackgroundColor,
 }
 impl Default for ChangeButtonBundle {
     fn default() -> Self {
         Self {
-            button: ButtonBundle {
-                style: Style {
-                    border: UiRect {
-                        left: Val::Px(2.0),
-                        right: Val::Px(2.0),
-                        top: Val::Px(2.0),
-                        bottom: Val::Px(2.0),
-                    },
-                    width: Val::Px(90.0),
-                    height: Val::Px(90.0),
-                    align_self: AlignSelf::Center,
-                    justify_content: JustifyContent::Center,
-                    ..default()
+            node: Node {
+                border: UiRect {
+                    left: Val::Px(2.0),
+                    right: Val::Px(2.0),
+                    top: Val::Px(2.0),
+                    bottom: Val::Px(2.0),
                 },
-                border_color: Color::NONE.into(),
+                width: Val::Px(90.0),
+                height: Val::Px(90.0),
+                align_self: AlignSelf::Center,
+                justify_content: JustifyContent::Center,
                 ..default()
             },
             //background_color: BackgroundColor(my_colors::PURPLE),
@@ -94,7 +90,7 @@ impl Default for NextButtonBundle {
 
 #[derive(Bundle)]
 pub struct SelectionWidgetBundle {
-    pub node: ButtonBundle,
+    pub node: Node,
     pub selectables: Selectables,
     pub selected_color: SelectedColor,
     pub unselected_color: UnselectedColor,
@@ -105,19 +101,16 @@ impl Default for SelectionWidgetBundle {
     fn default() -> Self {
         Self {
             selectables: Selectables,
-            node: ButtonBundle {
-                style: Style {
-                    height: Val::Auto,
-                    width: Val::Percent(100.0),
-                    align_self: AlignSelf::Center,
-                    justify_self: JustifySelf::Center,
-                    margin: UiRect {
-                        bottom: Val::Px(10.0),
-                        ..default()
-                    },
-                    display: Display::Flex,
+            node: Node {
+                height: Val::Auto,
+                width: Val::Percent(100.0),
+                align_self: AlignSelf::Center,
+                justify_self: JustifySelf::Center,
+                margin: UiRect {
+                    bottom: Val::Px(10.0),
                     ..default()
                 },
+                display: Display::Flex,
                 ..default()
             },
             selected_color: SelectedColor(Color::NONE),
@@ -129,24 +122,21 @@ impl Default for SelectionWidgetBundle {
 
 #[derive(Bundle)]
 pub struct CurrentSelectionBundle {
-    pub node: NodeBundle,
+    pub node: Node,
     pub name: Name,
 }
 
 impl Default for CurrentSelectionBundle {
     fn default() -> Self {
         Self {
-            node: NodeBundle {
-                style: Style {
-                    position_type: PositionType::Relative,
-                    align_self: AlignSelf::Center,           // vertical
-                    justify_self: JustifySelf::Center,       //horizontal
-                    justify_content: JustifyContent::Center, //horizontal
-                    height: Val::Percent(100.0),
-                    width: Val::Percent(100.0),
-                    display: Display::Flex,
-                    ..default()
-                },
+            node: Node {
+                position_type: PositionType::Relative,
+                align_self: AlignSelf::Center,           // vertical
+                justify_self: JustifySelf::Center,       //horizontal
+                justify_content: JustifyContent::Center, //horizontal
+                height: Val::Percent(100.0),
+                width: Val::Percent(100.0),
+                display: Display::Flex,
                 ..default()
             },
             name: Name::new("Current Selection"),

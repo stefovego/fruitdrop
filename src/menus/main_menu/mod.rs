@@ -8,7 +8,6 @@ mod options_menu;
 mod start_menu;
 mod video_menu;
 
-use crate::menu::components::MenuComponent;
 use menu_state::MainMenuState;
 
 use self::game_menu::GameMenuPlugin;

@@ -1,6 +1,6 @@
 use crate::game_state::*;
 use crate::score::PlayerScore;
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 
 const WIDTH: f32 = 900.;
 const HEIGHT: f32 = 400.;
@@ -52,67 +52,45 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     commands.spawn((
-        MaterialMesh2dBundle {
-            mesh: meshes.add(Rectangle::new(WIDTH, HEIGHT)).into(),
-            material: materials.add(ColorMaterial::from_color(LinearRgba::rgb(
-                1.0, 0.388, 0.278,
-            ))), //TOMATO
-            transform: Transform {
-                translation: Vec3 {
-                    x: 0.,
-                    y: -100.,
-                    z: 3.,
-                },
-                ..default()
-            },
-            ..default()
-        },
+        Mesh2d(meshes.add(Rectangle::new(WIDTH, HEIGHT))),
+        MeshMaterial2d(materials.add(ColorMaterial::from_color(LinearRgba::rgb(
+            1.0, 0.388, 0.278,
+        )))), //TOMATO
+        Transform::from_translation(Vec3 {
+            x: 0.,
+            y: -100.,
+            z: 3.,
+        }),
         GameOver,
     ));
     commands.spawn((
-        Text2dBundle {
-            text: Text::from_section(
-                player_score.value.to_string(),
-                TextStyle {
-                    font: asset_server.load("fonts/Roboto-Black.ttf"),
-                    font_size: 60.,
-                    ..default()
-                },
-            ),
-            transform: Transform {
-                translation: Vec3 {
-                    x: 0.,
-                    y: -160.,
-                    z: 4.,
-                },
-                ..default()
-            },
+        Text::new(player_score.value.to_string()),
+        TextFont {
+            font: asset_server.load("fonts/Roboto-Black.ttf"),
+            font_size: 60.,
             ..default()
         },
+        Transform::from_translation(Vec3 {
+            x: 0.,
+            y: -160.,
+            z: 4.,
+        }),
         Name::new("gameover score"),
         GameOver,
     ));
 
     commands.spawn((
-        Text2dBundle {
-            text: Text::from_section(
-                "Game Over!!!",
-                TextStyle {
-                    font: asset_server.load("fonts/Roboto-Black.ttf"),
-                    font_size: 80.,
-                    ..default()
-                },
-            ),
-            transform: Transform {
-                translation: Vec3 {
-                    x: 0.,
-                    y: 0.,
-                    z: 4.,
-                },
-                ..default()
-            },
+        Text::new("Game Over!!!"),
+        TextFont {
+            font: asset_server.load("fonts/Roboto-Black.ttf"),
+            font_size: 80.,
             ..default()
         },
+        Transform::from_translation(Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 4.,
+        }),
         Name::new("gameover message"),
         GameOver,
     ));

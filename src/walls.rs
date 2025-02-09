@@ -1,7 +1,7 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
-use crate::game_state::{AppState, GameState};
+use crate::game_state::AppState;
 use crate::physics::Layer;
 
 pub const LEVEL_WIDTH: f32 = 700.;
@@ -30,15 +30,12 @@ fn spawn_walls(mut commands: Commands) {
     info!("setup spawn_walls");
     // Spawn Bottom Wall
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
-                custom_size: Some(Vec2::new(LEVEL_WIDTH, WALL_THICKNESS)),
-                ..default()
-            },
-            transform: Transform::from_xyz(0.0, -405.0, 0.0),
+        Sprite {
+            color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
+            custom_size: Some(Vec2::new(LEVEL_WIDTH, WALL_THICKNESS)),
             ..default()
         },
+        Transform::from_xyz(0.0, -405.0, 0.0),
         RigidBody::Static,
         Collider::rectangle(LEVEL_WIDTH, WALL_THICKNESS),
         CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
@@ -48,15 +45,12 @@ fn spawn_walls(mut commands: Commands) {
 
     // Spawn Left Wall
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
-                custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
-                ..default()
-            },
-            transform: Transform::from_xyz(-(LEVEL_WIDTH / 2. + WALL_THICKNESS / 2.), -55.0, 0.0),
+        Sprite {
+            color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
+            custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
             ..default()
         },
+        Transform::from_xyz(-(LEVEL_WIDTH / 2. + WALL_THICKNESS / 2.), -55.0, 0.0),
         RigidBody::Static,
         Collider::rectangle(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
         CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
@@ -66,15 +60,12 @@ fn spawn_walls(mut commands: Commands) {
 
     // Spawn Right Wall
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
-                custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
-                ..default()
-            },
-            transform: Transform::from_xyz(LEVEL_WIDTH / 2. + WALL_THICKNESS / 2., -55.0, 0.0),
+        Sprite {
+            color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
+            custom_size: Some(Vec2::new(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS)),
             ..default()
         },
+        Transform::from_xyz(LEVEL_WIDTH / 2. + WALL_THICKNESS / 2., -55.0, 0.0),
         RigidBody::Static,
         Collider::rectangle(WALL_THICKNESS, LEVEL_HEIGHT + WALL_THICKNESS),
         CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),

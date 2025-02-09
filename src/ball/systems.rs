@@ -2,17 +2,16 @@ use avian2d::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::ball;
-use crate::ball::{components::*, materials::BallMaterial, resources::*, utils::*};
+use crate::ball::{components::*, resources::*, utils::*};
 
 use crate::dropper::components::Dropper;
-use crate::dropper::resources::DropperStats;
-use crate::dropper::resources::LoadedBall;
+use crate::dropper::resources::{DropperStats, LoadedBall};
 use crate::handle_input::Action;
 use crate::loserbox::LoserBox;
 use crate::ondeck::OnDeckBall;
 use crate::physics::Layer;
 use crate::score::PlayerScore;
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 
 pub const KING_BALL: BallType = BallType::XXLarge;
 
@@ -33,9 +32,9 @@ pub fn grow_balls(
         grow_timer.timer.tick(time.delta());
         if grow_timer.timer.just_finished() {
             transform.scale = Vec3::new(1., 1., 1.0);
-            commands
-                .entity(entity)
-                .insert(materials.add(ColorMaterial::from_color(grow_timer.new_color)));
+            commands.entity(entity).insert(MeshMaterial2d(
+                materials.add(ColorMaterial::from_color(grow_timer.new_color)),
+            ));
             // commands.entity(entity).insert(materials.add(BallMaterial {
             //     color: grow_timer.new_color.into(),
             // }));
@@ -53,9 +52,9 @@ pub fn grow_balls(
 
             let m = old.lerp(new, grow_timer.timer.fraction());
 
-            commands
-                .entity(entity)
-                .insert(materials.add(ColorMaterial::from_color(LinearRgba::from_vec4(m))));
+            commands.entity(entity).insert(MeshMaterial2d(
+                materials.add(ColorMaterial::from_color(LinearRgba::from_vec4(m))),
+            ));
             //.insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
             transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
         }
@@ -127,25 +126,22 @@ pub fn handle_collisions(
                     let new_ball = get_ball_stats(og_ball_type.upgraded);
                     let new_ball_size =
                         ball_scaler.initial_size * ball_scaler.size_multiplier.powf(new_ball.level);
-                    let mesh_material = MaterialMesh2dBundle {
-                        mesh: meshes.add(Circle::new(new_ball_size)).into(),
-                        material: materials.add(ColorMaterial::from_color(new_ball.color)),
-                        transform: Transform {
-                            translation: third_ball_translation,
-                            scale: Vec3::new(
-                                grow_stats.initial_multiplier,
-                                grow_stats.initial_multiplier,
-                                1.,
-                            ),
-                            ..default()
-                        },
-                        ..default()
-                    };
                     commands
-                        .spawn(ball::bundles::new_seed(
-                            mesh_material,
-                            og_ball_type.upgraded,
-                            ball_scaler.clone(),
+                        .spawn((
+                            ball::bundles::new_seed(og_ball_type.upgraded, ball_scaler.clone()),
+                            Mesh2d(meshes.add(Circle::new(new_ball_size))),
+                            MeshMaterial2d(
+                                materials.add(ColorMaterial::from_color(new_ball.color)),
+                            ),
+                            Transform {
+                                translation: third_ball_translation,
+                                scale: Vec3::new(
+                                    grow_stats.initial_multiplier,
+                                    grow_stats.initial_multiplier,
+                                    1.,
+                                ),
+                                ..default()
+                            },
                         ))
                         .insert(GrowTimer {
                             timer: Timer::from_seconds(grow_stats.grow_speed, TimerMode::Once),
@@ -192,27 +188,22 @@ pub fn spawn_ball(
             let balldata = get_ball_stats(loadedball.balltype);
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
-            let mesh_material = MaterialMesh2dBundle {
-                mesh: meshes.add(Circle::new(ball_size)).into(),
-                // material: materials.add(BallMaterial {
-                //     color: balldata.color,
-                // }),
-                material: materials.add(ColorMaterial::from_color(balldata.color)),
-                transform: Transform {
-                    translation: Vec3::new(
-                        transform.translation.x,
-                        transform.translation.y - 50.0,
-                        1.0,
-                    ),
-                    ..default()
-                },
-                ..default()
-            };
+            // material: materials.add(BallMaterial {
+            //     color: balldata.color,
+            // }),
             commands
-                .spawn(ball::bundles::new(
-                    mesh_material,
-                    loadedball.balltype,
-                    ball_scaler.clone(),
+                .spawn((
+                    ball::bundles::new(loadedball.balltype, ball_scaler.clone()),
+                    Mesh2d(meshes.add(Circle::new(ball_size))),
+                    MeshMaterial2d(materials.add(ColorMaterial::from_color(balldata.color))),
+                    Transform {
+                        translation: Vec3::new(
+                            transform.translation.x,
+                            transform.translation.y - 50.0,
+                            1.0,
+                        ),
+                        ..default()
+                    },
                 ))
                 .insert(DropTimer {
                     timer: Timer::from_seconds(dropper_stats.delay_time, TimerMode::Once),
@@ -237,7 +228,7 @@ pub fn ball_scaler_changed(
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball_stats.level);
             commands
                 .entity(entity)
-                .insert(meshes.add(Circle::new(new_ball_size)));
+                .insert(Mesh2d(meshes.add(Circle::new(new_ball_size))));
         }
     }
 }

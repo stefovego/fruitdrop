@@ -15,16 +15,16 @@ impl Plugin for CameraPlugin {
 fn setup_graphics(mut commands: Commands) {
     //commands.spawn(Camera2dBundle::default());
     commands.spawn((
-        Camera2dBundle {
-            projection: OrthographicProjection {
-                scaling_mode: ScalingMode::FixedVertical(1000.0),
-                near: -10.0,
-                far: 10.,
-                ..default()
+        Camera2d::default(),
+        OrthographicProjection {
+            scaling_mode: ScalingMode::FixedVertical {
+                viewport_height: 1000.0,
             },
-            //transform: Transform::from_xyz(1000.0, -1000.0, 0.0),
-            ..default()
+            near: -10.0,
+            far: 10.,
+            ..OrthographicProjection::default_2d()
         },
+        // Transform::from_xyz(1000.0, -1000.0, 0.0),
         MainCamera,
     ));
 }
