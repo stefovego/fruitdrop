@@ -1,4 +1,5 @@
 use avian2d::prelude::*;
+use bevy::animation::{animated_field, AnimationTarget, AnimationTargetId};
 use leafwing_input_manager::prelude::*;
 
 use crate::ball;
@@ -18,46 +19,6 @@ pub const KING_BALL: BallType = BallType::XXLarge;
 pub fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Ball>>) {
     for ball_entity in &ball_query {
         commands.entity(ball_entity).despawn_recursive();
-    }
-}
-
-pub fn grow_balls(
-    mut commands: Commands,
-    mut grow_timer_query: Query<(Entity, &mut Transform, &mut GrowTimer), With<GrowTimer>>,
-    time: Res<Time>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    //mut materials: ResMut<Assets<BallMaterial>>,
-) {
-    for (entity, mut transform, mut grow_timer) in &mut grow_timer_query {
-        grow_timer.timer.tick(time.delta());
-        if grow_timer.timer.just_finished() {
-            transform.scale = Vec3::new(1., 1., 1.0);
-            commands.entity(entity).insert(MeshMaterial2d(
-                materials.add(ColorMaterial::from_color(grow_timer.new_color)),
-            ));
-            // commands.entity(entity).insert(materials.add(BallMaterial {
-            //     color: grow_timer.new_color.into(),
-            // }));
-            // commands.entity(entity).remove::<GrowTimer>();
-        } else {
-            let grow_percent = (1. - grow_timer.initial_multiplier) * grow_timer.timer.fraction()
-                + grow_timer.initial_multiplier;
-            //TODO: This needs a clean up
-            //let mut current_color = &mut materials.get_mut(handle_color).unwrap().color;
-            let old = grow_timer.old_color.to_vec4();
-            //let old = Vec4::new(o[0], o[1], o[2], o[3]);
-
-            let new = grow_timer.new_color.to_vec4();
-            // let new = Vec4::new(n[0], n[1], n[2], n[3]);
-
-            let m = old.lerp(new, grow_timer.timer.fraction());
-
-            commands.entity(entity).insert(MeshMaterial2d(
-                materials.add(ColorMaterial::from_color(LinearRgba::from_vec4(m))),
-            ));
-            //.insert(materials.add(ColorMaterial::from(Color::rgba_linear(m.x, m.y, m.z, m.w))));
-            transform.scale = Vec3::new(grow_percent, grow_percent, 1.0);
-        }
     }
 }
 
@@ -99,16 +60,18 @@ pub fn seed_systems(
         ));
     }
 }
+
 pub fn handle_collisions(
     mut commands: Commands,
     ball_query: Query<(Entity, &BallType, &Transform), With<Ball>>,
     mut collision_events: EventReader<CollisionStarted>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    //mut materials: ResMut<Assets<BallMaterial>>,
     mut player_score: ResMut<PlayerScore>,
     ball_scaler: Res<BallScaler>,
     grow_stats: Res<GrowStats>,
+    mut animations: ResMut<Assets<AnimationClip>>,
+    mut graphs: ResMut<Assets<AnimationGraph>>,
 ) {
     for collision_event in collision_events.read() {
         if let (Ok((f, ft, first_transform)), Ok((s, st, second_transform))) = (
@@ -121,12 +84,36 @@ pub fn handle_collisions(
                 commands.entity(f).despawn();
                 commands.entity(s).despawn();
                 if *ft != KING_BALL {
+                    let name_component = Name::new("Ball");
+                    // Prep Animations
+                    // Create animation
+                    let mut animation = AnimationClip::default();
+                    // Curve that modifies a transform
+                    let ball_animation_target_id = AnimationTargetId::from_name(&name_component);
+                    animation.add_curve_to_target(
+                        ball_animation_target_id,
+                        AnimatableCurve::new(
+                            animated_field!(Transform::scale),
+                            AnimatableKeyframeCurve::new(
+                                [0.0, 0.5]
+                                    .into_iter()
+                                    .zip([Vec3::splat(0.5), Vec3::splat(1.0)]),
+                            )
+                            .expect("Ball Animation Fail"),
+                        ),
+                    );
+                    let (graph, animation_index) =
+                        AnimationGraph::from_clip(animations.add(animation));
+                    // Create the animation player, and set it to repeat
+                    let mut player = AnimationPlayer::default();
+                    player.play(animation_index);
+
                     let og_ball_type = get_ball_stats(*ft);
                     player_score.value += og_ball_type.points;
                     let new_ball = get_ball_stats(og_ball_type.upgraded);
                     let new_ball_size =
                         ball_scaler.initial_size * ball_scaler.size_multiplier.powf(new_ball.level);
-                    commands
+                    let ball_entity = commands
                         .spawn((
                             ball::bundles::new_seed(og_ball_type.upgraded, ball_scaler.clone()),
                             Mesh2d(meshes.add(Circle::new(new_ball_size))),
@@ -142,14 +129,20 @@ pub fn handle_collisions(
                                 ),
                                 ..default()
                             },
+                            //name_component,
+                            AnimationGraphHandle(graphs.add(graph)),
+                            player,
                         ))
-                        .insert(GrowTimer {
-                            timer: Timer::from_seconds(grow_stats.grow_speed, TimerMode::Once),
-                            initial_multiplier: grow_stats.initial_multiplier,
-                            old_color: og_ball_type.color.into(),
-                            new_color: new_ball.color.into(),
-                        })
-                        .insert(Seed);
+                        .id();
+
+                    commands.entity(ball_entity).insert(CollisionLayers::new(
+                        [Layer::Ball],
+                        [Layer::Wall, Layer::Ball],
+                    ));
+                    commands.entity(ball_entity).insert(AnimationTarget {
+                        id: ball_animation_target_id,
+                        player: ball_entity,
+                    });
                 } else {
                     player_score.value += get_ball_stats(KING_BALL).points;
                 }
@@ -188,9 +181,6 @@ pub fn spawn_ball(
             let balldata = get_ball_stats(loadedball.balltype);
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(balldata.level);
-            // material: materials.add(BallMaterial {
-            //     color: balldata.color,
-            // }),
             commands
                 .spawn((
                     ball::bundles::new(loadedball.balltype, ball_scaler.clone()),

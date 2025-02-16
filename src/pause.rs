@@ -1,4 +1,3 @@
-use bevy::input::gamepad::GamepadEvent;
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 

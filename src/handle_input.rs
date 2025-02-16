@@ -33,6 +33,3 @@ impl Action {
         ])
     }
 }
-
-#[derive(Component)]
-struct Controls;

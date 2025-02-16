@@ -44,54 +44,50 @@ fn trigger_gameover(
     }
 }
 
-fn setup(
-    mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    player_score: Res<PlayerScore>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    asset_server: Res<AssetServer>,
-) {
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(WIDTH, HEIGHT))),
-        MeshMaterial2d(materials.add(ColorMaterial::from_color(LinearRgba::rgb(
-            1.0, 0.388, 0.278,
-        )))), //TOMATO
-        Transform::from_translation(Vec3 {
-            x: 0.,
-            y: -100.,
-            z: 3.,
-        }),
-        GameOver,
-    ));
-    commands.spawn((
-        Text::new(player_score.value.to_string()),
-        TextFont {
-            font: asset_server.load("fonts/Roboto-Black.ttf"),
-            font_size: 60.,
-            ..default()
-        },
-        Transform::from_translation(Vec3 {
-            x: 0.,
-            y: -160.,
-            z: 4.,
-        }),
-        Name::new("gameover score"),
-        GameOver,
-    ));
-
-    commands.spawn((
-        Text::new("Game Over!!!"),
-        TextFont {
-            font: asset_server.load("fonts/Roboto-Black.ttf"),
-            font_size: 80.,
-            ..default()
-        },
-        Transform::from_translation(Vec3 {
-            x: 0.,
-            y: 0.,
-            z: 4.,
-        }),
-        Name::new("gameover message"),
-        GameOver,
-    ));
+fn setup(mut commands: Commands, player_score: Res<PlayerScore>, asset_server: Res<AssetServer>) {
+    commands
+        .spawn((
+            Node {
+                display: Display::Grid,
+                width: Val::Percent(100.),
+                height: Val::Percent(100.),
+                justify_items: JustifyItems::Center,
+                align_items: AlignItems::Center,
+                ..Default::default()
+            },
+            Name::new("Game Over Screen"),
+            GameOver,
+        ))
+        .with_children(|parent| {
+            parent
+                .spawn((
+                    Node {
+                        display: Display::Grid,
+                        width: Val::Px(WIDTH),
+                        height: Val::Px(HEIGHT),
+                        justify_items: JustifyItems::Center,
+                        align_items: AlignItems::Center,
+                        ..Default::default()
+                    },
+                    BackgroundColor(Color::srgb(1.0, 0.388, 0.278)), // Tomato
+                ))
+                .with_children(|parent| {
+                    parent.spawn((
+                        Text::new("Game Over!!!"),
+                        TextFont {
+                            font: asset_server.load("fonts/Roboto-Black.ttf"),
+                            font_size: 80.0,
+                            ..Default::default()
+                        },
+                    ));
+                    parent.spawn((
+                        Text::new(player_score.value.to_string()),
+                        TextFont {
+                            font: asset_server.load("fonts/Roboto-Black.ttf"),
+                            font_size: 60.0,
+                            ..Default::default()
+                        },
+                    ));
+                });
+        });
 }

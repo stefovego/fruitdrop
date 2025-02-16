@@ -29,7 +29,14 @@ impl Plugin for BallPlugin {
             .add_systems(Update, fresh_balls.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
-                (seed_systems, handle_collisions, apply_deferred, grow_balls).chain().run_if(in_state(GameState::Playing)),
+                (
+                    seed_systems,
+                    handle_collisions,
+                    apply_deferred,
+                    // grow_balls
+                )
+                    .chain()
+                    .run_if(in_state(GameState::Playing)),
             )
             .add_systems(OnExit(GameState::GameOver), tear_down);
     }

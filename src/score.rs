@@ -1,4 +1,4 @@
-use crate::game_state::GameState;
+use crate::game_state::{AppState, GameState};
 use bevy::prelude::*;
 
 pub struct ScorePlugin;
@@ -8,12 +8,9 @@ pub const SCORE_BOARD_Y: f32 = 300.;
 impl Plugin for ScorePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(PlayerScore { value: 0 })
-            .add_systems(OnEnter(GameState::Playing), spawn_scoreboard)
-            .add_systems(
-                Update,
-                update_scoreboard.run_if(in_state(GameState::Playing)),
-            )
-            .add_systems(OnExit(GameState::GameOver), tear_down);
+            .add_systems(OnEnter(AppState::InGame), spawn_scoreboard)
+            .add_systems(Update, update_scoreboard.run_if(in_state(AppState::InGame)))
+            .add_systems(OnExit(AppState::InGame), tear_down);
     }
 }
 

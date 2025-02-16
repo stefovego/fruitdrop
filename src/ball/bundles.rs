@@ -16,7 +16,7 @@ pub struct BallBundle {
     collision_layer: CollisionLayers,
     collider_density: ColliderDensity,
     balltype: BallType,
-    name: Name,
+    //name: Name,
     ball: Ball,
 }
 
@@ -31,7 +31,7 @@ pub fn new(ball_type: BallType, ball_scaler: BallScaler) -> BallBundle {
         collider_density: ColliderDensity(BALL_DENSITY),
         balltype: ball_type,
         ball: Ball {},
-        name: Name::new("Ball"),
+        //name: Name::new("Ball"),
     }
 }
 
@@ -46,6 +46,6 @@ pub fn new_seed(ball_type: BallType, ball_scaler: BallScaler) -> BallBundle {
         collider_density: ColliderDensity(BALL_DENSITY),
         balltype: ball_type,
         ball: Ball {},
-        name: Name::new("Ball"),
+        //name: Name::new("Ball"),
     }
 }

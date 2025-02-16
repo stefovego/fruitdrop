@@ -1,4 +1,4 @@
-use crate::{menu::components::*, my_colors};
+use crate::menu::components::*;
 use bevy::prelude::*;
 
 #[derive(Component)]

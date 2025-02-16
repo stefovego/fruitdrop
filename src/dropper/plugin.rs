@@ -1,11 +1,10 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::dropper::components::*;
 use crate::dropper::resources::*;
 
 use crate::ball::{
-    materials::BallMaterial,
     resources::BallScaler,
     utils::{get_ball_stats, random_ball},
 };
