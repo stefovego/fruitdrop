@@ -13,3 +13,6 @@ pub struct BallScaler {
     pub initial_size: f32,
     pub size_multiplier: f32,
 }
+
+#[derive(Resource)]
+pub struct BallColors(pub [Color; 11]);

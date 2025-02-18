@@ -1,16 +1,11 @@
 use bevy::prelude::*;
+use rand::Rng;
 
-use crate::ball::{
-    components::BallType,
-    resources::BallScaler,
-    utils::{get_ball_stats, random_ball},
-};
+use crate::ball::resources::{BallColors, BallScaler};
 use crate::game_state::{AppState, GameState};
 
 #[derive(Resource)]
-pub struct OnDeckBall {
-    pub balltype: BallType,
-}
+pub struct OnDeckBall(pub usize);
 
 #[derive(Component)]
 pub struct OnDeckBallComponent;
@@ -26,21 +21,21 @@ pub const BOX_HEIGHT: f32 = 150.;
 pub const BOX_X: f32 = 650.;
 pub const BOX_Y: f32 = 250.;
 pub const BOX_THICKNESS: f32 = 4.;
+const MAX_DROPPABLE_LEVEL: usize = 4;
 
 pub struct OnDeckPlugin;
 
 impl Plugin for OnDeckPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(OnDeckBall {
-            balltype: random_ball(),
-        })
-        .add_systems(OnEnter(AppState::InGame), spawn_deck)
-        .add_systems(
-            Update,
-            on_deck_ball_change.run_if(in_state(GameState::Playing)),
-        )
-        .add_systems(OnExit(AppState::InGame), tear_down_ball)
-        .add_systems(OnExit(AppState::InGame), tear_down_box);
+        let mut rng = rand::thread_rng();
+        app.insert_resource(OnDeckBall(rng.gen_range(0..MAX_DROPPABLE_LEVEL)))
+            .add_systems(OnEnter(AppState::InGame), spawn_deck)
+            .add_systems(
+                Update,
+                on_deck_ball_change.run_if(in_state(GameState::Playing)),
+            )
+            .add_systems(OnExit(AppState::InGame), tear_down_ball)
+            .add_systems(OnExit(AppState::InGame), tear_down_box);
     }
 }
 
@@ -63,8 +58,13 @@ fn spawn_deck(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut on_deck_ball: ResMut<OnDeckBall>,
     ball_scaler: Res<BallScaler>,
+    ball_colors: Res<BallColors>,
 ) {
-    on_deck_ball.balltype = random_ball();
+    let BallColors(ball_colors) = *ball_colors;
+    let mut rng = rand::thread_rng();
+    let level = rng.gen_range(0..MAX_DROPPABLE_LEVEL);
+
+    *on_deck_ball = OnDeckBall(level);
     // Spawn The Box Entity
     commands.spawn((
         Sprite::from_color(
@@ -109,12 +109,11 @@ fn spawn_deck(
         ))
         .id();
 
-    let ball = get_ball_stats(on_deck_ball.balltype);
-    let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
+    let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
     let on_deck_ball_entity = commands
         .spawn((
             Mesh2d(meshes.add(Circle::new(ball_size))),
-            MeshMaterial2d(materials.add(ColorMaterial::from_color(ball.color))),
+            MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
             Transform::from_xyz(0.0, 0., 1.),
             OnDeckBallComponent,
         ))
@@ -131,20 +130,22 @@ fn on_deck_ball_change(
     mut on_deck_ball_query: Query<(&Parent, Entity), With<OnDeckBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    //mut materials: ResMut<Assets<BallMaterial>>,
     ball_scaler: Res<BallScaler>,
+    ball_colors: Res<BallColors>,
 ) {
+    let BallColors(ball_colors) = *ball_colors;
     if on_deck_ball.is_changed() {
         if let Ok((parent, child)) = on_deck_ball_query.get_single_mut() {
             commands.entity(parent.get()).remove_children(&[child]);
             commands.entity(child).despawn();
 
-            let ball = get_ball_stats(on_deck_ball.balltype);
-            let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(ball.level);
+            let OnDeckBall(level) = *on_deck_ball;
+            let ball_size =
+                ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
             let loadball_entity = commands
                 .spawn((
                     Mesh2d(meshes.add(Circle::new(ball_size))),
-                    MeshMaterial2d(materials.add(ColorMaterial::from_color(ball.color))),
+                    MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
                     Transform::from_xyz(0., 0., 1.),
                     OnDeckBallComponent,
                     Name::new("OnDeck"),

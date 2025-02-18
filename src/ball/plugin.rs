@@ -21,6 +21,19 @@ impl Plugin for BallPlugin {
                 initial_multiplier: 0.3,
                 grow_speed: 0.7,
             })
+            .insert_resource(BallColors([
+                Color::srgb_u8(0xEF, 0x3A, 0x0C),
+                Color::srgb_u8(0x27, 0x64, 0x68),
+                Color::srgb_u8(0x9B, 0x1A, 0x0A),
+                Color::srgb_u8(0xEF, 0x69, 0x1F),
+                Color::srgb_u8(0xEF, 0xAC, 0x28),
+                Color::srgb_u8(0xEF, 0xB7, 0x75),
+                Color::srgb_u8(0xA5, 0x8C, 0x27),
+                Color::srgb_u8(0xA5, 0x62, 0x43),
+                Color::srgb_u8(0x18, 0x3F, 0x39),
+                Color::srgb_u8(0x3C, 0x9F, 0x9C),
+                Color::srgb_u8(0x39, 0x57, 0x1C),
+            ]))
             .add_systems(Update, spawn_ball.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,

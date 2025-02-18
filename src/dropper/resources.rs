@@ -1,4 +1,3 @@
-use crate::ball::components::BallType;
 use bevy::prelude::*;
 
 #[derive(Reflect, Resource, Clone, Default)]
@@ -9,6 +8,4 @@ pub struct DropperStats {
 }
 
 #[derive(Resource)]
-pub struct LoadedBall {
-    pub balltype: BallType,
-}
+pub struct LoadedBall(pub usize);

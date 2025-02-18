@@ -22,7 +22,12 @@ impl Plugin for GameOverPlugin {
     }
 }
 
-fn tear_down(mut commands: Commands, gameover_query: Query<Entity, With<GameOver>>) {
+fn tear_down(
+    mut commands: Commands,
+    gameover_query: Query<Entity, With<GameOver>>,
+    mut player_score: ResMut<PlayerScore>,
+) {
+    player_score.value = 0;
     for gameover_entity in &gameover_query {
         commands.entity(gameover_entity).despawn_recursive();
     }
