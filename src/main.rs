@@ -3,6 +3,7 @@ use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use game_board::GameBoardPlugins;
 //use noisy_bevy::NoisyShaderPlugin;
 use web_sys;
 
@@ -10,9 +11,6 @@ mod handle_input;
 
 mod camera;
 use camera::*;
-
-mod walls;
-use walls::*;
 
 mod dropper;
 use dropper::plugin::DropperPlugin;
@@ -36,14 +34,17 @@ mod gameover;
 use gameover::*;
 
 mod ball;
+mod game_board;
 mod physics;
-
 //mod mygui;
 //use mygui::*;
-
 mod menu;
 mod menus;
 mod pause;
+mod walls;
+
+mod ingame_ui;
+use ingame_ui::*;
 
 //mod states;
 
@@ -71,7 +72,8 @@ fn main() {
         .init_state::<AppState>()
         .add_plugins(BallPlugin)
         .add_plugins(CameraPlugin)
-        .add_plugins(WallsPlugin)
+        .add_plugins(GameBoardPlugins)
+        //.add_plugins(WallsPlugin)
         .add_plugins(OnDeckPlugin)
         .add_plugins(DropperPlugin)
         .add_plugins(ScorePlugin)
@@ -83,6 +85,7 @@ fn main() {
         .add_plugins(pause_menu::PauseMenuPlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(PausePlugin)
+        .add_plugins(InGameUiPlugin)
         .add_systems(Startup, update_canvas_size)
         //.add_systems(Startup, update_canvas_size.run_if(cfg!(target_arch = "wasm32")))
         .run();
