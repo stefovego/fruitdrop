@@ -1,4 +1,4 @@
-use crate::game_state::{AppState, GameState};
+use crate::game_state::AppState;
 use bevy::prelude::*;
 
 pub struct ScorePlugin;
@@ -24,7 +24,7 @@ pub struct PlayerScore {
 
 fn tear_down(mut commands: Commands, score_query: Query<Entity, With<Score>>) {
     for score_entity in &score_query {
-        commands.entity(score_entity).despawn_recursive();
+        commands.entity(score_entity).despawn();
     }
 }
 

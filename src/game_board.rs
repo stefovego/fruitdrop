@@ -1,6 +1,9 @@
-use crate::game_state::AppState;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
+use crate::ball::plugin::{BallPlugin, InitBallSet};
+use crate::dropper::plugin::*;
+use crate::game_state::AppState;
+use crate::loserbox::*;
 use crate::walls::*;
 
 #[derive(Reflect, Component, Clone, Copy)]
@@ -29,6 +32,9 @@ impl PluginGroup for GameBoardPlugins {
         PluginGroupBuilder::start::<Self>()
             .add(GameBoardPlugin)
             .add_before::<GameBoardPlugin>(WallsPlugin)
+            .add_before::<GameBoardPlugin>(DropperPlugin)
+            .add_after::<GameBoardPlugin>(BallPlugin)
+            .add_after::<GameBoardPlugin>(LoserBoxPlugin)
     }
 }
 
@@ -42,12 +48,20 @@ impl Plugin for GameBoardPlugin {
             width: 700,
             height: 700,
         })
-        .add_systems(OnEnter(AppState::InGame), setup.before(InitWallSet))
+        .add_systems(
+            OnEnter(AppState::InGame),
+            setup
+                .before(InitWallSet)
+                .before(InitDropperSet)
+                .before(InitBallSet)
+                .before(InitLoserBoxSet),
+        )
         .add_systems(OnExit(AppState::InGame), tear_down);
     }
 }
 
 fn setup(mut commands: Commands, game_board: Res<GameBoardResource>) {
+    info!("GameBoard Plugin setup");
     commands.spawn((
         Transform::from_xyz(0., -55., 0.),
         Size {
@@ -56,6 +70,7 @@ fn setup(mut commands: Commands, game_board: Res<GameBoardResource>) {
         },
         GameBoard,
         Name::new("Game Board"),
+        InheritedVisibility::VISIBLE,
     ));
 }
 

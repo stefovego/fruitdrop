@@ -7,9 +7,11 @@ pub struct SelectedColor(pub Color);
 #[derive(Component)]
 pub struct UnselectedColor(pub Color);
 
+#[allow(dead_code)]
 #[derive(Component)]
 pub struct NextButtonEntity(pub Entity);
 
+#[allow(dead_code)]
 #[derive(Component)]
 pub struct PreviousButtonEntity(pub Entity);
 
@@ -49,7 +51,6 @@ impl Default for ChangeButtonBundle {
                 justify_content: JustifyContent::Center,
                 ..default()
             },
-            //background_color: BackgroundColor(my_colors::PURPLE),
         }
     }
 }

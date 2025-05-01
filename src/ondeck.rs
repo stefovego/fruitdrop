@@ -41,13 +41,13 @@ impl Plugin for OnDeckPlugin {
 
 fn tear_down_ball(mut commands: Commands, ball_query: Query<Entity, With<OnDeckBallComponent>>) {
     for ball_entity in &ball_query {
-        commands.entity(ball_entity).despawn_recursive();
+        commands.entity(ball_entity).despawn();
     }
 }
 
 fn tear_down_box(mut commands: Commands, box_query: Query<Entity, With<OnDeckBox>>) {
     for box_entity in &box_query {
-        commands.entity(box_entity).despawn_recursive();
+        commands.entity(box_entity).despawn();
     }
 }
 
@@ -104,7 +104,7 @@ fn spawn_deck(
     let on_deck_entity = commands
         .spawn((
             Transform::from_xyz(650.0, 250.0, 0.0),
-            InheritedVisibility::VISIBLE,
+            Visibility::Visible,
             OnDeck,
         ))
         .id();
@@ -127,7 +127,7 @@ fn spawn_deck(
 fn on_deck_ball_change(
     mut commands: Commands,
     on_deck_ball: Res<OnDeckBall>,
-    mut on_deck_ball_query: Query<(&Parent, Entity), With<OnDeckBallComponent>>,
+    mut on_deck_ball_query: Query<(&ChildOf, Entity), With<OnDeckBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     ball_scaler: Res<BallScaler>,
@@ -135,8 +135,8 @@ fn on_deck_ball_change(
 ) {
     let BallColors(ball_colors) = *ball_colors;
     if on_deck_ball.is_changed() {
-        if let Ok((parent, child)) = on_deck_ball_query.get_single_mut() {
-            commands.entity(parent.get()).remove_children(&[child]);
+        if let Ok((child_of, child)) = on_deck_ball_query.single_mut() {
+            commands.entity(child_of.parent()).remove_children(&[child]);
             commands.entity(child).despawn();
 
             let OnDeckBall(level) = *on_deck_ball;
@@ -152,7 +152,9 @@ fn on_deck_ball_change(
                 ))
                 .id();
 
-            commands.entity(parent.get()).add_child(loadball_entity);
+            commands
+                .entity(child_of.parent())
+                .add_child(loadball_entity);
         }
     }
 }

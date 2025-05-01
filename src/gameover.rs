@@ -29,7 +29,7 @@ fn tear_down(
 ) {
     player_score.value = 0;
     for gameover_entity in &gameover_query {
-        commands.entity(gameover_entity).despawn_recursive();
+        commands.entity(gameover_entity).despawn();
     }
 }
 fn exit_gameover_screen(

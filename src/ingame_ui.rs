@@ -9,13 +9,11 @@ pub struct InGameUiPlugin;
 
 impl Plugin for InGameUiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::InGame), setup)
-            .add_systems(OnExit(AppState::InGame), tear_down);
+        app.add_systems(OnEnter(AppState::InGame), setup);
     }
 }
 
 fn setup(mut commands: Commands) {
-    println!("InGameUi.setup");
     commands.spawn((
         Node {
             width: Val::Percent(100.),
@@ -26,4 +24,3 @@ fn setup(mut commands: Commands) {
         InGameUi,
     ));
 }
-fn tear_down(mut commands: Commands) {}

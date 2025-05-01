@@ -16,14 +16,14 @@ fn setup_graphics(mut commands: Commands) {
     //commands.spawn(Camera2dBundle::default());
     commands.spawn((
         Camera2d::default(),
-        OrthographicProjection {
+        Projection::Orthographic(OrthographicProjection {
             scaling_mode: ScalingMode::FixedVertical {
                 viewport_height: 1000.0,
             },
             near: -10.0,
             far: 10.,
             ..OrthographicProjection::default_2d()
-        },
+        }),
         // Transform::from_xyz(1000.0, -1000.0, 0.0),
         MainCamera,
     ));

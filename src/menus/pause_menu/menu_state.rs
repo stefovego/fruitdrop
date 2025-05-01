@@ -7,5 +7,5 @@ use bevy::prelude::*;
 pub enum PauseMenuState {
     #[default]
     InitialMenu,
-    Unpaused,
+    //Unpaused,
 }

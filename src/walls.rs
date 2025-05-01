@@ -25,7 +25,7 @@ struct Wall;
 
 fn tear_down(mut commands: Commands, wall_query: Query<Entity, With<Wall>>) {
     for wall_entity in &wall_query {
-        commands.entity(wall_entity).despawn_recursive();
+        commands.entity(wall_entity).despawn();
     }
 }
 
@@ -34,6 +34,21 @@ fn spawn_walls(
     game_board: Single<Entity, With<GameBoard>>,
     game_board_resource: Res<GameBoardResource>,
 ) {
+    // commands.spawn((
+    //     ChildOf(*game_board),
+    //     Sprite {
+    //         color: Color::linear_rgb(0.502, 0.502, 0.502), //was gray
+    //         custom_size: Some(Vec2::new(game_board_resource.width as f32, WALL_THICKNESS)),
+    //         ..default()
+    //     },
+    //     Transform::from_xyz(0., -(game_board_resource.height as f32 / 2.), 0.0),
+    //     //RigidBody::Static,
+    //     //Collider::rectangle(game_board_resource.height as f32, WALL_THICKNESS),
+    //     //CollisionLayers::new([Layer::Wall], [Layer::Wall, Layer::Ball]),
+    //     Wall,
+    //     Name::new("Bottom Wall"),
+    // ));
+
     commands.entity(*game_board).with_children(|parent| {
         // Spawn Bottom Wall
         parent.spawn((

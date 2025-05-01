@@ -12,7 +12,7 @@ pub fn move_slider(
         return;
     }
 
-    let SelectedEnt(selected_ent) = selected_query.single();
+    let SelectedEnt(selected_ent) = selected_query.single().unwrap();
 
     for (entity, mut slider_component) in &mut slider_query {
         if keys.just_pressed(KeyCode::ArrowLeft) && selected_ent == &entity {
@@ -69,7 +69,7 @@ pub fn mouse_system(
     parent_query: Query<Entity, With<MenuComponent>>,
     mut commands: Commands,
 ) {
-    let parent_entity = if let Ok(parent_entity) = parent_query.get_single() {
+    let parent_entity = if let Ok(parent_entity) = parent_query.single() {
         parent_entity
     } else {
         return;
@@ -101,7 +101,7 @@ pub fn selected_background(
         return;
     }
 
-    let SelectedEnt(selected_ent) = selected_query.single();
+    let SelectedEnt(selected_ent) = selected_query.single().unwrap();
 
     for (
         entity,
@@ -119,7 +119,7 @@ pub fn selected_background(
 }
 
 pub fn mousy_stuffy(
-    parent_query: Query<&Parent>,
+    parent_query: Query<&ChildOf>,
     relative_cursor_query: Query<(Entity, &RelativeCursorPosition), With<RelativeCursorPosition>>,
     mut slider_query: Query<&mut SliderWidgetComponent>,
     mouse_click_query: Res<ButtonInput<MouseButton>>,

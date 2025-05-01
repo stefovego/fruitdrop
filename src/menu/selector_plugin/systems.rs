@@ -13,7 +13,7 @@ pub fn mouse_system(
     mut commands: Commands,
 ) {
     // let parent_entity = parent_query.get_single().unwrap();
-    let parent_entity = if let Ok(parent_entity) = parent_query.get_single() {
+    let parent_entity = if let Ok(parent_entity) = parent_query.single() {
         parent_entity
     } else {
         return;
@@ -45,7 +45,7 @@ pub fn selected_background(
         return;
     }
 
-    let SelectedEnt(selected_ent) = selected_query.single();
+    let SelectedEnt(selected_ent) = selected_query.single().unwrap();
 
     for (
         entity,
@@ -108,7 +108,8 @@ pub fn previous_button_clicked(
         (Changed<Interaction>, With<PreviousComponent>),
     >,
     mut selector_query: Query<&mut SelectorWidgetComponent, With<SelectorWidgetComponent>>,
-    parent_query: Query<&Parent>,
+    parent_query: Query<&ChildOf>,
+    //parent_query: Query<&Parent>,
 ) {
     for (previous_button_entity, interaction) in &mut interaction_query {
         match *interaction {
@@ -139,7 +140,8 @@ pub fn next_button_clicked(
         (Changed<Interaction>, With<NextComponent>),
     >,
     mut selector_query: Query<&mut SelectorWidgetComponent, With<SelectorWidgetComponent>>,
-    parent_query: Query<&Parent>,
+    parent_query: Query<&ChildOf>,
+    //parent_query: Query<&Parent>,
 ) {
     for (previous_button_entity, interaction) in &mut interaction_query {
         match *interaction {
@@ -168,7 +170,7 @@ pub fn key_toggle(
     if selected_query.is_empty() {
         return;
     }
-    let SelectedEnt(selected_ent) = selected_query.single();
+    let SelectedEnt(selected_ent) = selected_query.single().unwrap();
 
     if let Ok(mut selector_component) = selector_query.get_mut(*selected_ent) {
         if keys.just_pressed(KeyCode::ArrowLeft) {

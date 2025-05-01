@@ -8,6 +8,7 @@ use crate::ball::{components::*, resources::*};
 
 use crate::dropper::components::Dropper;
 use crate::dropper::resources::{DropperStats, LoadedBall};
+use crate::game_board::GameBoard;
 use crate::handle_input::Action;
 use crate::loserbox::LoserBox;
 use crate::ondeck::OnDeckBall;
@@ -19,7 +20,7 @@ const MAX_DROPPABLE_LEVEL: usize = 4;
 
 pub fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Ball>>) {
     for ball_entity in &ball_query {
-        commands.entity(ball_entity).despawn_recursive();
+        commands.entity(ball_entity).despawn();
     }
 }
 
@@ -30,6 +31,7 @@ pub fn fresh_balls(
     mut collision_events: EventReader<CollisionStarted>,
 ) {
     for collision_event in collision_events.read() {
+        info!("Collision Event");
         for entity in [collision_event.0, collision_event.1] {
             if let Ok(entity) = ball_query.get(entity) {
                 let other_entity = if entity == collision_event.0 {
@@ -74,6 +76,7 @@ pub fn handle_collisions(
     mut animations: ResMut<Assets<AnimationClip>>,
     mut graphs: ResMut<Assets<AnimationGraph>>,
     ball_colors: Res<BallColors>,
+    game_board: Single<Entity, With<GameBoard>>,
 ) {
     for collision_event in collision_events.read() {
         let BallColors(ball_colors) = *ball_colors;
@@ -137,20 +140,15 @@ pub fn handle_collisions(
                                     ),
                                     ..default()
                                 },
-                                //name_component,
                                 AnimationGraphHandle(graphs.add(graph)),
                                 player,
                             ))
                             .id();
-
-                    commands.entity(ball_entity).insert(CollisionLayers::new(
-                        [Layer::Ball],
-                        [Layer::Wall, Layer::Ball],
-                    ));
                     commands.entity(ball_entity).insert(AnimationTarget {
                         id: ball_animation_target_id,
                         player: ball_entity,
                     });
+                    commands.entity(*game_board).add_child(ball_entity);
                 } else {
                     player_score.value += 500_u32 * 2_u32.pow(*first_level as u32 + 1);
                 }
@@ -173,6 +171,7 @@ pub fn spawn_ball(
     _grow_stats: Res<GrowStats>,
     dropper_stats: Res<DropperStats>,
     ball_colors: Res<BallColors>,
+    game_board: Single<Entity, With<GameBoard>>,
 ) {
     let BallColors(ball_colors) = *ball_colors;
     for (entity, mut droptimer) in &mut drop_timer_query {
@@ -184,14 +183,16 @@ pub fn spawn_ball(
         }
     }
 
-    if let Ok(transform) = dropper_query.get_single() {
+    if let Ok(transform) = dropper_query.single() {
         if input.just_pressed(&Action::DropBall) {
             //let balldata = get_ball_stats(loadedball.balltype);
             let LoadedBall(level) = *loadedball;
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
             commands
-                .spawn((
+                .entity(*game_board)
+                //.spawn((
+                .with_child((
                     ball::bundles::new(level, ball_scaler.clone()),
                     Mesh2d(meshes.add(Circle::new(ball_size))),
                     MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),

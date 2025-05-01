@@ -30,16 +30,19 @@ impl Plugin for MenuPlugin {
 
 pub struct InsertWidgetCommand(Entity);
 
-impl InsertWidgetCommand {
-    pub fn spawn(wiget_entity: Entity) -> Self
-where {
-        Self(wiget_entity)
-    }
-}
+// impl InsertWidgetCommand {
+//     pub fn spawn(wiget_entity: Entity) -> Self
+// where {
+//         Self(wiget_entity)
+//     }
+// }
 
 impl EntityCommand for InsertWidgetCommand {
-    fn apply(self, parent_id: Entity, world: &mut World) {
-        world.entity_mut(parent_id).add_children(&[self.0]);
+    fn apply(self, mut entity_world: EntityWorldMut) {
+        let entity = entity_world.id();
+        entity_world.world_scope(move |world: &mut World| {
+            world.entity_mut(entity).add_children(&[self.0]);
+        });
     }
 }
 

@@ -40,7 +40,7 @@ pub fn mouse_system(
     parent_query: Query<Entity, With<MenuComponent>>,
     mut commands: Commands,
 ) {
-    let parent_entity = parent_query.get_single().unwrap();
+    let parent_entity = parent_query.single().unwrap();
     for (entity, interaction) in &mut interaction_query {
         match *interaction {
             Interaction::Hovered => {
@@ -63,7 +63,7 @@ pub fn keyboard_select(
         return;
     }
 
-    let SelectedEnt(currently_selected) = parent_query.single();
+    let SelectedEnt(currently_selected) = parent_query.single().unwrap();
 
     if keys.just_pressed(KeyCode::Enter) {
         commands.trigger_targets(ButtonPushed, *currently_selected);

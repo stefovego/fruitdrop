@@ -14,7 +14,7 @@ pub struct FpsDisplayPlugin;
 
 impl Plugin for FpsDisplayPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(FrameTimeDiagnosticsPlugin)
+        app.add_plugins(FrameTimeDiagnosticsPlugin::default())
             .add_systems(Startup, spawn_fps_display)
             .add_systems(Update, update_fps_display)
             .add_systems(Update, toggle_display);
@@ -42,7 +42,7 @@ fn toggle_display(
     input: Res<ActionState<Action>>,
 ) {
     if input.just_pressed(&Action::ToggleFps) {
-        let mut visible = visibility_query.single_mut();
+        let mut visible = visibility_query.single_mut().unwrap();
         match *visible {
             Visibility::Visible => *visible = Visibility::Hidden,
             Visibility::Hidden => *visible = Visibility::Visible,

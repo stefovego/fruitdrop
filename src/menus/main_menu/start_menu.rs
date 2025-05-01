@@ -114,8 +114,8 @@ pub fn start_button_observer(
     mut ball_scaler_stats: ResMut<BallScaler>,
     mut grow_stats: ResMut<GrowStats>,
 ) {
-    let size_slider_value = size_slider_query.get_single().unwrap();
-    let grow_speed_slider_value = grow_speed_slider_query.get_single().unwrap();
+    let size_slider_value = size_slider_query.single().unwrap();
+    let grow_speed_slider_value = grow_speed_slider_query.single().unwrap();
     ball_scaler_stats.initial_size = size_slider_value.current_value as f32;
     grow_stats.grow_speed = grow_speed_slider_value.current_value as f32;
 }

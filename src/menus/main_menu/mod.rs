@@ -34,5 +34,5 @@ impl Plugin for MainMenuPlugin {
 }
 
 pub fn quit_system(mut events: EventWriter<AppExit>) {
-    events.send(AppExit::Success);
+    events.write(AppExit::Success);
 }

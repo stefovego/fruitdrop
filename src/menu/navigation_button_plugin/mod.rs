@@ -50,34 +50,37 @@ where {
 }
 
 impl<T: FreelyMutableState> EntityCommand for SpawnNavigationButton<T> {
-    fn apply(self, parent_id: Entity, world: &mut World) {
-        let text_button_widget = world
-            .entity_mut(parent_id)
-            .insert(NavigationButtonBundle {
-                selected_color: SelectedColor(self.navigation_button.selected_color),
-                unselected_color: UnselectedColor(self.navigation_button.unselected_color),
-                ..default()
-            })
-            .insert(BackgroundColor(self.navigation_button.unselected_color))
-            .id();
+    fn apply(self, mut entity_world: EntityWorldMut) {
+        let entity = entity_world.id();
+        entity_world.world_scope(move |world: &mut World| {
+            let text_button_widget = world
+                .entity_mut(entity)
+                .insert(NavigationButtonBundle {
+                    selected_color: SelectedColor(self.navigation_button.selected_color),
+                    unselected_color: UnselectedColor(self.navigation_button.unselected_color),
+                    ..default()
+                })
+                .insert(BackgroundColor(self.navigation_button.unselected_color))
+                .id();
 
-        let text_button_label_widget = world
-            .spawn((
-                Text::new(self.navigation_button.text),
-                TextColor(my_colors::PINK),
-                TextFont {
-                    font_size: 100.0,
-                    ..Default::default()
+            let text_button_label_widget = world
+                .spawn((
+                    Text::new(self.navigation_button.text),
+                    TextColor(my_colors::PINK),
+                    TextFont {
+                        font_size: 100.0,
+                        ..Default::default()
+                    },
+                ))
+                .id();
+            world.entity_mut(text_button_widget).observe(
+                move |_tigger: Trigger<ButtonPushed>, mut next_states: ResMut<NextState<T>>| {
+                    next_states.set(self.navigation_button.next_state.clone());
                 },
-            ))
-            .id();
-        world.entity_mut(text_button_widget).observe(
-            move |_tigger: Trigger<ButtonPushed>, mut next_states: ResMut<NextState<T>>| {
-                next_states.set(self.navigation_button.next_state.clone());
-            },
-        );
-        world
-            .entity_mut(text_button_widget)
-            .add_children(&[text_button_label_widget]);
+            );
+            world
+                .entity_mut(text_button_widget)
+                .add_children(&[text_button_label_widget]);
+        });
     }
 }

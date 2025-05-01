@@ -2,18 +2,21 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::ball::components::{Ball, FreshBall};
-use crate::game_state::GameState;
+use crate::game_board::{GameBoard, GameBoardResource};
+use crate::game_state::{AppState, GameState};
 
-pub const WIDTH: f32 = 700.;
 pub const HEIGHT: f32 = 50.;
 pub const BORDER_HEIGHT: f32 = 350.;
 pub const DANGER_ZONE: f32 = 300.;
+
+#[derive(SystemSet, Debug, Clone, Eq, PartialEq, Hash)]
+pub struct InitLoserBoxSet;
 
 pub struct LoserBoxPlugin;
 
 impl Plugin for LoserBoxPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), setup)
+        app.add_systems(OnEnter(AppState::InGame), setup.in_set(InitLoserBoxSet))
             .add_systems(OnExit(GameState::GameOver), tear_down)
             .add_systems(
                 Update,
@@ -33,7 +36,7 @@ pub struct DangerWarning {
 
 fn tear_down(mut commands: Commands, loser_box_query: Query<Entity, With<LoserBox>>) {
     for loser_box_entity in &loser_box_query {
-        commands.entity(loser_box_entity).despawn_recursive();
+        commands.entity(loser_box_entity).despawn();
     }
 }
 
@@ -87,25 +90,37 @@ fn handle_collisions(
 
 fn setup(
     mut commands: Commands,
+    game_board: Single<Entity, With<GameBoard>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    game_board_resource: Res<GameBoardResource>,
 ) {
-    commands.spawn((
-        Collider::rectangle(WIDTH, HEIGHT),
-        Transform::from_xyz(0., BORDER_HEIGHT, 0.),
-        Sensor,
-        LoserBox,
-        Name::new("LoserBox"),
-    ));
+    let GameBoardResource {
+        x: _,
+        y: _,
+        width,
+        height: _,
+    } = *game_board_resource;
 
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(WIDTH, 10.))),
-        MeshMaterial2d(materials.add(ColorMaterial::from_color(Color::linear_rgb(1.0, 0.0, 0.0)))),
-        Transform::from_translation(Vec3::new(0., BORDER_HEIGHT, 1.0)),
-        //Transform::from_xyz(0.0, BORDER_HEIGHT, 0.0),
-        DangerWarning {
-            color: Color::linear_rgb(1.0, 0.0, 0.0),
-        },
-        Name::new("danger_warning"),
-    ));
+    commands.entity(*game_board).with_children(|parent| {
+        parent.spawn((
+            Collider::rectangle(width as f32, HEIGHT),
+            Transform::from_xyz(0., BORDER_HEIGHT, 0.),
+            Sensor,
+            LoserBox,
+            Name::new("LoserBox"),
+        ));
+
+        parent.spawn((
+            Mesh2d(meshes.add(Rectangle::new(width as f32, 10.))),
+            MeshMaterial2d(
+                materials.add(ColorMaterial::from_color(Color::linear_rgb(1.0, 0.0, 0.0))),
+            ),
+            Transform::from_translation(Vec3::new(0., BORDER_HEIGHT, 1.0)),
+            DangerWarning {
+                color: Color::linear_rgb(1.0, 0.0, 0.0),
+            },
+            Name::new("danger_warning"),
+        ));
+    });
 }

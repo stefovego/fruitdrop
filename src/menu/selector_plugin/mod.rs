@@ -56,149 +56,152 @@ impl SpawnSelector {
 }
 
 impl EntityCommand for SpawnSelector {
-    fn apply(self, parent_id: Entity, world: &mut World) {
-        let selection_widget = world
-            .entity_mut(parent_id)
-            .insert(SelectionWidgetBundle {
-                selected_color: SelectedColor(self.selector.selected_color),
-                unselected_color: UnselectedColor(self.selector.unselected_color),
-                ..default()
-            })
-            .insert(BackgroundColor(self.selector.unselected_color))
-            .insert(Name::new("Selector Widget"))
-            .id();
-
-        let middle_spacer = world
-            .spawn(Node {
-                width: Val::Percent(20.0),
-                ..default()
-            })
-            .insert(Name::new("Middle Spacer"))
-            .id();
-
-        let selection_container = world
-            .spawn(Node {
-                width: Val::Percent(100.0),
-                column_gap: Val::Px(10.0),
-                justify_content: JustifyContent::SpaceEvenly,
-                ..default()
-            })
-            .insert(Name::new("Selection Container"))
-            .id();
-
-        let previous_button = world
-            .spawn(PreviousButtonBundle::default())
-            .insert(Name::new("Previous Button"))
-            .id();
-
-        let previous_label = world
-            .spawn((
-                Text::new("<"),
-                TextColor(Color::BLACK),
-                TextFont {
-                    font_size: 50.0,
-                    ..Default::default()
-                },
-            ))
-            // .insert(Style {
-            //     align_self: AlignSelf::Center,
-            //     ..default()
-            // })
-            .insert(Name::new("Previous Label"))
-            .id();
-
-        let next_button = world
-            .spawn(NextButtonBundle::default())
-            .insert(Name::new("Next Button"))
-            .id();
-
-        let next_label = world
-            .spawn((
-                Text::new(">"),
-                TextColor(Color::BLACK),
-                TextFont {
-                    font_size: 50.0,
-                    ..Default::default()
-                },
-            ))
-            //.insert(Style {
-            //    align_self: AlignSelf::Center,
-            //    ..default()
-            //})
-            .insert(Name::new("Next Button Label"))
-            .id();
-
-        let current_selection = world.spawn(CurrentSelectionBundle { ..default() }).id();
-
-        let current_selection_label = world
-            .spawn((
-                Text::new(self.selector.selections.first().unwrap()),
-                TextColor(Color::BLACK),
-                TextFont {
-                    font_size: 50.0,
-                    ..Default::default()
-                },
-            ))
-            // .insert(Style {
-            //     align_self: AlignSelf::Center,
-            //     ..default()
-            // })
-            .insert(Name::new("Current Selection Label"))
-            .id();
-
-        let label = world
-            .spawn((
-                Text::new(self.selector.label),
-                TextColor(Color::BLACK),
-                TextFont {
-                    font_size: 50.0,
-                    ..Default::default()
-                },
-            ))
-            .id();
-
-        let label_container = world
-            .spawn((
-                Node {
-                    width: Val::Percent(35.0),
-                    justify_content: JustifyContent::Start,
-                    align_items: AlignItems::Center,
+    fn apply(self, mut entity_world: EntityWorldMut) {
+        let entity = entity_world.id();
+        entity_world.world_scope(move |world: &mut World| {
+            let selection_widget = world
+                .entity_mut(entity)
+                .insert(SelectionWidgetBundle {
+                    selected_color: SelectedColor(self.selector.selected_color),
+                    unselected_color: UnselectedColor(self.selector.unselected_color),
                     ..default()
-                },
-                Name::new("Label Container"),
-            ))
-            .id();
+                })
+                .insert(BackgroundColor(self.selector.unselected_color))
+                .insert(Name::new("Selector Widget"))
+                .id();
 
-        world.entity_mut(previous_button).add_child(previous_label);
+            let middle_spacer = world
+                .spawn(Node {
+                    width: Val::Percent(20.0),
+                    ..default()
+                })
+                .insert(Name::new("Middle Spacer"))
+                .id();
 
-        world.entity_mut(next_button).add_child(next_label);
+            let selection_container = world
+                .spawn(Node {
+                    width: Val::Percent(100.0),
+                    column_gap: Val::Px(10.0),
+                    justify_content: JustifyContent::SpaceEvenly,
+                    ..default()
+                })
+                .insert(Name::new("Selection Container"))
+                .id();
 
-        world.entity_mut(label_container).add_child(label);
+            let previous_button = world
+                .spawn(PreviousButtonBundle::default())
+                .insert(Name::new("Previous Button"))
+                .id();
 
-        world
-            .entity_mut(current_selection)
-            .add_child(current_selection_label);
+            let previous_label = world
+                .spawn((
+                    Text::new("<"),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 50.0,
+                        ..Default::default()
+                    },
+                ))
+                // .insert(Style {
+                //     align_self: AlignSelf::Center,
+                //     ..default()
+                // })
+                .insert(Name::new("Previous Label"))
+                .id();
 
-        world
-            .entity_mut(selection_container)
-            .add_child(previous_button)
-            .add_child(current_selection)
-            .add_child(next_button);
+            let next_button = world
+                .spawn(NextButtonBundle::default())
+                .insert(Name::new("Next Button"))
+                .id();
 
-        world
-            .entity_mut(selection_widget)
-            .add_child(label_container)
-            .add_child(middle_spacer)
-            .add_child(selection_container);
+            let next_label = world
+                .spawn((
+                    Text::new(">"),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 50.0,
+                        ..Default::default()
+                    },
+                ))
+                //.insert(Style {
+                //    align_self: AlignSelf::Center,
+                //    ..default()
+                //})
+                .insert(Name::new("Next Button Label"))
+                .id();
 
-        world
-            .entity_mut(selection_widget)
-            .insert(SelectorWidgetComponent {
-                current_index: 0,
-                selections: self.selector.selections,
-            })
-            .insert(PreviousButtonEntity(previous_button))
-            .insert(NextButtonEntity(next_button))
-            .insert(CurrentSelectionEntity(current_selection_label));
+            let current_selection = world.spawn(CurrentSelectionBundle { ..default() }).id();
+
+            let current_selection_label = world
+                .spawn((
+                    Text::new(self.selector.selections.first().unwrap()),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 50.0,
+                        ..Default::default()
+                    },
+                ))
+                // .insert(Style {
+                //     align_self: AlignSelf::Center,
+                //     ..default()
+                // })
+                .insert(Name::new("Current Selection Label"))
+                .id();
+
+            let label = world
+                .spawn((
+                    Text::new(self.selector.label),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 50.0,
+                        ..Default::default()
+                    },
+                ))
+                .id();
+
+            let label_container = world
+                .spawn((
+                    Node {
+                        width: Val::Percent(35.0),
+                        justify_content: JustifyContent::Start,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    Name::new("Label Container"),
+                ))
+                .id();
+
+            world.entity_mut(previous_button).add_child(previous_label);
+
+            world.entity_mut(next_button).add_child(next_label);
+
+            world.entity_mut(label_container).add_child(label);
+
+            world
+                .entity_mut(current_selection)
+                .add_child(current_selection_label);
+
+            world
+                .entity_mut(selection_container)
+                .add_child(previous_button)
+                .add_child(current_selection)
+                .add_child(next_button);
+
+            world
+                .entity_mut(selection_widget)
+                .add_child(label_container)
+                .add_child(middle_spacer)
+                .add_child(selection_container);
+
+            world
+                .entity_mut(selection_widget)
+                .insert(SelectorWidgetComponent {
+                    current_index: 0,
+                    selections: self.selector.selections,
+                })
+                .insert(PreviousButtonEntity(previous_button))
+                .insert(NextButtonEntity(next_button))
+                .insert(CurrentSelectionEntity(current_selection_label));
+        });
     }
 }

@@ -12,12 +12,14 @@ pub fn key_input(
     let c = items_query.iter().next().unwrap();
     if selected_items.is_empty() {
         if keys.just_pressed(KeyCode::ArrowUp) || keys.just_pressed(KeyCode::ArrowDown) {
-            commands.entity(menu_query.single()).insert(SelectedEnt(c));
+            commands
+                .entity(menu_query.single().unwrap())
+                .insert(SelectedEnt(c));
         }
         return;
     }
 
-    let (entity, SelectedEnt(currently_selected)) = &selected_items.single();
+    let (entity, SelectedEnt(currently_selected)) = &selected_items.single().unwrap();
     let item_list: Vec<Entity> = container_query
         .iter()
         .flat_map(|ent| items_query.iter_many(ent))
@@ -36,10 +38,11 @@ pub fn key_input(
     }
 }
 
+#[allow(unused)]
 pub fn teardown_menu(mut commands: Commands, menu_query: Query<Entity, With<MenuComponent>>) {
     print!("Tear Down This Menu");
     for entity in &menu_query {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
