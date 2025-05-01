@@ -61,7 +61,6 @@ impl Plugin for GameBoardPlugin {
 }
 
 fn setup(mut commands: Commands, game_board: Res<GameBoardResource>) {
-    info!("GameBoard Plugin setup");
     commands.spawn((
         Transform::from_xyz(0., -55., 0.),
         Size {
@@ -74,4 +73,8 @@ fn setup(mut commands: Commands, game_board: Res<GameBoardResource>) {
     ));
 }
 
-fn tear_down() {}
+fn tear_down(mut commands: Commands, game_board_query: Query<Entity, With<GameBoard>>) {
+    for game_board_entity in &game_board_query {
+        commands.entity(game_board_entity).despawn();
+    }
+}

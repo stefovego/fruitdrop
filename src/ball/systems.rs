@@ -31,7 +31,6 @@ pub fn fresh_balls(
     mut collision_events: EventReader<CollisionStarted>,
 ) {
     for collision_event in collision_events.read() {
-        info!("Collision Event");
         for entity in [collision_event.0, collision_event.1] {
             if let Ok(entity) = ball_query.get(entity) {
                 let other_entity = if entity == collision_event.0 {

@@ -27,7 +27,6 @@ fn pause_game(input: Res<ActionState<Action>>, mut next_state: ResMut<NextState<
 
 fn unpause_game(input: Res<ActionState<Action>>, mut next_state: ResMut<NextState<GameState>>) {
     if input.just_pressed(&Action::Pause) {
-        info!("Game Playing");
         next_state.set(GameState::Playing);
     }
 }

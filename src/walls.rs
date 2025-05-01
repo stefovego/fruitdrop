@@ -15,14 +15,15 @@ pub struct InitWallSet;
 
 impl Plugin for WallsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::InGame), spawn_walls.in_set(InitWallSet))
-            .add_systems(OnExit(AppState::InGame), tear_down);
+        app.add_systems(OnEnter(AppState::InGame), spawn_walls.in_set(InitWallSet));
+        // .add_systems(OnExit(AppState::InGame), tear_down);
     }
 }
 
 #[derive(Component)]
 struct Wall;
 
+#[allow(unused)]
 fn tear_down(mut commands: Commands, wall_query: Query<Entity, With<Wall>>) {
     for wall_entity in &wall_query {
         commands.entity(wall_entity).despawn();
