@@ -1,5 +1,6 @@
 use avian2d::prelude::*;
 use bevy::animation::{animated_field, AnimationTarget, AnimationTargetId};
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 use rand::Rng;
 
@@ -10,10 +11,10 @@ use crate::dropper::resources::{DropperStats, LoadedBall};
 use crate::game_board::GameBoard;
 use crate::handle_input::Action;
 use crate::loserbox::LoserBox;
+use crate::material_color_animation::{AnimatedColor, MaterialColorAnimation};
 use crate::ondeck::OnDeckBall;
 use crate::physics::Layer;
 use crate::score::PlayerScore;
-use bevy::prelude::*;
 
 const MAX_DROPPABLE_LEVEL: usize = 4;
 
@@ -23,6 +24,7 @@ pub fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Ball>>) 
     }
 }
 
+// Prevents the ball from triggering the gameover event when first dropped
 pub fn fresh_balls(
     mut commands: Commands,
     ball_query: Query<Entity, With<FreshBall>>,
@@ -51,7 +53,6 @@ pub fn seed_systems(
     mut seed_query: Query<(Entity, &mut CollisionLayers), With<Seed>>,
 ) {
     for (entity, mut collision_layer) in &mut seed_query {
-        // collision_layer.remove_mask(Layer::NotBall);
         collision_layer.memberships.add(Layer::Ball);
         commands.entity(entity).remove::<CollisionLayers>();
         commands.entity(entity).remove::<Seed>();
@@ -94,7 +95,8 @@ pub fn handle_collisions(
                     let next_level = *first_level + 1;
                     let new_ball_size = ball_scaler.initial_size
                         * ball_scaler.size_multiplier.powf(next_level as f32);
-                    let ball_color = ball_colors[next_level as usize];
+                    let ball_color = ball_colors[next_level - 1 as usize];
+                    let next_ball_color = ball_colors[next_level as usize];
                     spawn_new_ball(
                         &mut commands,
                         &game_board,
@@ -105,6 +107,7 @@ pub fn handle_collisions(
                         &grow_stats,
                         new_ball_size,
                         ball_color,
+                        next_ball_color,
                         third_ball_translation,
                         next_level,
                     );
@@ -118,6 +121,7 @@ pub fn handle_collisions(
     }
 }
 
+// Spawns a ball after two matching balls collide
 pub fn spawn_new_ball(
     commands: &mut Commands,
     game_board: &Single<Entity, With<GameBoard>>,
@@ -128,33 +132,11 @@ pub fn spawn_new_ball(
     grow_stats: &Res<GrowStats>,
     ball_size: f32,
     ball_color: Color,
+    next_ball_color: Color,
     translation: Vec3,
     next_level: usize,
 ) {
-    // Spawns a ball after two matching balls collide
-
     let name_component = Name::new("Ball");
-    // Prep Animations
-    // Create animation
-    let mut animation = AnimationClip::default();
-    // Curve that modifies a transform
-    let ball_animation_target_id = AnimationTargetId::from_name(&name_component);
-    animation.add_curve_to_target(
-        ball_animation_target_id,
-        AnimatableCurve::new(
-            animated_field!(Transform::scale),
-            AnimatableKeyframeCurve::new(
-                [0.0, 0.5]
-                    .into_iter()
-                    .zip([Vec3::splat(0.5), Vec3::splat(1.0)]),
-            )
-            .expect("Ball Animation Fail"),
-        ),
-    );
-    let (graph, animation_index) = AnimationGraph::from_clip(animations.add(animation));
-    // Create the animation player, and set it to repeat
-    let mut player = AnimationPlayer::default();
-    player.play(animation_index);
 
     let ball_entity = commands
         .spawn((
@@ -172,17 +154,16 @@ pub fn spawn_new_ball(
                 ),
                 ..default()
             },
-            AnimationGraphHandle(graphs.add(graph)),
-            player,
+            AnimatedColor {
+                color: next_ball_color,
+                time_seconds: 2.0,
+            },
         ))
         .id();
-    commands.entity(ball_entity).insert(AnimationTarget {
-        id: ball_animation_target_id,
-        player: ball_entity,
-    });
     commands.entity(**game_board).add_child(ball_entity);
 }
 
+// Spawns a freshly dropped ball
 pub fn spawn_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -199,8 +180,6 @@ pub fn spawn_ball(
     ball_colors: Res<BallColors>,
     game_board: Single<Entity, With<GameBoard>>,
 ) {
-    // Spawns a freshly dropped ball
-
     let BallColors(ball_colors) = *ball_colors;
     for (entity, mut droptimer) in &mut drop_timer_query {
         droptimer.timer.tick(time.delta());
@@ -213,15 +192,12 @@ pub fn spawn_ball(
 
     if let Ok(transform) = dropper_query.single() {
         if input.just_pressed(&Action::DropBall) {
-            //let balldata = get_ball_stats(loadedball.balltype);
             let LoadedBall(level) = *loadedball;
             let ball_size =
                 ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
             commands
                 .entity(*game_board)
-                //.spawn((
                 .with_child((
-                    // ball::bundles::new(level, ball_scaler.clone()),
                     Ball,
                     Collider::circle(ball_size),
                     BallLevel(level),

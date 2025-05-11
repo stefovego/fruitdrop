@@ -1,6 +1,6 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
-use crate::ball::plugin::{BallPlugin, InitBallSet};
+use crate::ball::{BallPlugin, InitBallSet};
 use crate::dropper::plugin::*;
 use crate::game_state::AppState;
 use crate::loserbox::*;

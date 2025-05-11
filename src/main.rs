@@ -18,6 +18,7 @@ mod gameover;
 mod handle_input;
 mod ingame_ui;
 mod loserbox;
+mod material_color_animation;
 mod menu;
 mod menus;
 mod ondeck;
@@ -31,6 +32,7 @@ use crate::fps_display::*;
 use crate::game_state::*;
 use crate::gameover::*;
 use crate::ingame_ui::*;
+use crate::material_color_animation::*;
 use crate::menu::*;
 use crate::menus::*;
 use crate::ondeck::*;
@@ -58,6 +60,7 @@ fn main() {
         .add_plugins(WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F9)))
         .init_state::<AppState>()
         .add_plugins(CameraPlugin)
+        .add_plugins(MaterialColorAnimation)
         .add_plugins(GameBoardPlugins)
         .add_plugins(OnDeckPlugin)
         .add_plugins(ScorePlugin)
