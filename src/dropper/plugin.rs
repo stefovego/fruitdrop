@@ -35,8 +35,12 @@ impl Plugin for DropperPlugin {
                     .chain()
                     .run_if(in_state(GameState::Playing)),
             )
-            .add_systems(Update, loaded_ball_change);
-        // .add_systems(OnExit(AppState::InGame), tear_down);
+            .add_systems(
+                Update,
+                loaded_ball_change.run_if(
+                    resource_exists_and_changed::<LoadedBall>.and(in_state(GameState::Playing)),
+                ),
+            );
     }
 }
 
@@ -50,36 +54,32 @@ fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Dropper>>) {
 fn loaded_ball_change(
     mut commands: Commands,
     loaded_ball: Res<LoadedBall>,
-    mut load_ball_query: Query<(&ChildOf, Entity), With<LoadedBallComponent>>,
+    mut load_ball_query: Single<(&ChildOf, Entity), With<LoadedBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     ball_scaler: Res<BallScaler>,
     ball_colors: Res<BallColors>,
 ) {
     let BallColors(ball_colors) = *ball_colors;
-    if loaded_ball.is_changed() {
-        if let Ok((child_of, child)) = load_ball_query.single_mut() {
-            commands.entity(child_of.parent()).remove_children(&[child]);
-            commands.entity(child).despawn();
+    let (child_of, child) = load_ball_query.into_inner();
+    commands.entity(child_of.parent()).remove_children(&[child]);
+    commands.entity(child).despawn();
 
-            let LoadedBall(level) = *loaded_ball;
-            let ball_size =
-                ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
+    let LoadedBall(level) = *loaded_ball;
+    let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
 
-            let loadball_entity = commands
-                .spawn((
-                    Mesh2d(meshes.add(Circle::new(ball_size))),
-                    MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
-                    Transform::from_xyz(0.0, 0., 1.),
-                ))
-                .insert(LoadedBallComponent)
-                .id();
+    let loadball_entity = commands
+        .spawn((
+            Mesh2d(meshes.add(Circle::new(ball_size))),
+            MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
+            Transform::from_xyz(0.0, 0., 1.),
+        ))
+        .insert(LoadedBallComponent)
+        .id();
 
-            commands
-                .entity(child_of.parent())
-                .add_child(loadball_entity);
-        }
-    }
+    commands
+        .entity(child_of.parent())
+        .add_child(loadball_entity);
 }
 fn spawn_dropper(
     mut commands: Commands,
@@ -108,6 +108,7 @@ fn spawn_dropper(
             ))
             .with_children(|parent| {
                 parent.spawn((
+                    Name::new("Ball Preview"),
                     Mesh2d(meshes.add(Circle::new(ball_size))),
                     MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
                     Transform::from_xyz(0.0, 0., 1.),
@@ -115,9 +116,6 @@ fn spawn_dropper(
                 ));
             });
     });
-    // commands.entity(*game_board).with_child();
-
-    // commands.entity(droper_entity).add_child(loadball_entity);
 }
 
 fn dropper_movement(
