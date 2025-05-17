@@ -9,11 +9,14 @@ use bevy::{
 // https://docs.rs/bevy/latest/bevy/prelude/trait.AnimatableProperty.html
 // https://docs.rs/bevy/latest/src/animated_ui/animated_ui.rs.html#169
 
+#[derive(SystemSet, Debug, Clone, Eq, PartialEq, Hash)]
+pub struct MaterialColorAnimationSet;
+
 pub struct MaterialColorAnimation;
 
 impl Plugin for MaterialColorAnimation {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, update_color)
+        app.add_systems(Update, update_color.in_set(MaterialColorAnimationSet))
             .register_type::<AnimatedColor>()
             .register_type::<CurrentColor>()
             .add_observer(component_added)

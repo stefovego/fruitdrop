@@ -27,5 +27,5 @@ pub struct DropTimer {
     pub timer: Timer,
 }
 
-#[derive(Component, Reflect)]
+#[derive(Component, Reflect, Debug)]
 pub struct BallLevel(pub usize);

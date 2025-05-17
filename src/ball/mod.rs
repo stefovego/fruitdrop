@@ -3,16 +3,28 @@ pub mod materials;
 pub mod resources;
 pub mod systems;
 
+use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
 use bevy::sprite::Material2dPlugin;
 
 use crate::ball::{materials::BallMaterial, resources::*, systems::*};
 use crate::game_state::{AppState, GameState};
+use crate::material_color_animation::MaterialColorAnimationSet;
 
 pub struct BallPlugin;
 
 #[derive(SystemSet, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct InitBallSet;
+
+pub struct BallPlugins;
+
+impl PluginGroup for BallPlugins {
+    fn build(self) -> bevy::app::PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
+            .add(BallPlugin)
+            .add_after::<BallPlugin>(BallPlugin)
+    }
+}
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
@@ -53,14 +65,10 @@ impl Plugin for BallPlugin {
             .add_systems(Update, fresh_balls.run_if(in_state(AppState::InGame)))
             .add_systems(
                 Update,
-                (
-                    seed_systems,
-                    handle_collisions,
-                    ApplyDeferred,
-                    // grow_balls
-                )
+                (seed_systems, handle_collisions, ApplyDeferred)
                     .chain()
-                    .run_if(in_state(AppState::InGame)),
+                    .run_if(in_state(AppState::InGame))
+                    .after(MaterialColorAnimationSet),
                 //.run_if(in_state(GameState::Playing)),
             )
             .add_systems(OnExit(GameState::GameOver), tear_down);
