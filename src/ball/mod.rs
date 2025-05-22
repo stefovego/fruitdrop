@@ -39,7 +39,7 @@ impl Plugin for BallPlugin {
             .register_type::<GrowStats>()
             .insert_resource(GrowStats {
                 initial_multiplier: 0.3,
-                grow_speed: 0.7,
+                grow_speed: 1.0,
             })
             .insert_resource(BallColors([
                 Color::srgb_u8(0xEF, 0x3A, 0x0C),

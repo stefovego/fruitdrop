@@ -9,7 +9,7 @@ pub struct ContainerComponent;
 #[derive(Component)]
 pub struct SelectedComponent;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Selectables;
 
 #[derive(Component)]

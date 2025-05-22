@@ -55,11 +55,12 @@ impl<T: FreelyMutableState> EntityCommand for SpawnNavigationButton<T> {
         entity_world.world_scope(move |world: &mut World| {
             let text_button_widget = world
                 .entity_mut(entity)
-                .insert(NavigationButtonBundle {
-                    selected_color: SelectedColor(self.navigation_button.selected_color),
-                    unselected_color: UnselectedColor(self.navigation_button.unselected_color),
-                    ..default()
-                })
+                //.insert(NavigationButtonBundle { ..default() })
+                .insert(NavigationButtonComponent)
+                .insert((
+                    SelectedColor(self.navigation_button.selected_color),
+                    UnselectedColor(self.navigation_button.unselected_color),
+                ))
                 .insert(BackgroundColor(self.navigation_button.unselected_color))
                 .id();
 
