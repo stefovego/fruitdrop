@@ -70,7 +70,8 @@ pub fn show_selection(
         ),
         With<ToggleWidgetComponent>,
     >,
-    mut button_query: Query<&mut BorderColor, With<Button>>,
+    mut button_query: Query<&mut BorderColor>,
+    //mut button_query: Query<&mut BorderColor, With<Button>>,
 ) {
     for (toggle_component, OnButtonEntity(on_button), OffButtonEntity(off_button)) in
         &mut toggle_button_query
@@ -78,6 +79,7 @@ pub fn show_selection(
         let [mut off_button_border, mut on_button_border] = button_query
             .get_many_mut([*off_button, *on_button])
             .unwrap();
+
         if !toggle_component.current_value {
             *off_button_border = BorderColor(my_colors::ORANGE); //Orange
             *on_button_border = BorderColor(Color::NONE);
@@ -134,6 +136,7 @@ pub fn off_click_toggle(
         }
     }
 }
+
 pub fn key_toggle(
     keys: Res<ButtonInput<KeyCode>>,
     mut toggle_button_query: Query<&mut ToggleWidgetComponent, With<ToggleWidgetComponent>>,

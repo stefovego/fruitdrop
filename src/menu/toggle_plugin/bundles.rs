@@ -30,6 +30,7 @@ pub struct ToggleButtonBundle {
     pub button: Node,
     pub background_color: BackgroundColor,
     pub border_color: BorderColor,
+    pub toggle_widget_component: ToggleWidgetComponent,
 }
 impl Default for ToggleButtonBundle {
     fn default() -> Self {
@@ -50,6 +51,9 @@ impl Default for ToggleButtonBundle {
             },
             background_color: BackgroundColor(my_colors::PURPLE),
             border_color: Color::NONE.into(),
+            toggle_widget_component: ToggleWidgetComponent {
+                current_value: true,
+            },
         }
     }
 }
