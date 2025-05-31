@@ -6,7 +6,7 @@ use bevy::prelude::*;
 
 use crate::navigation_button_plugin::{NavigationButton, SpawnNavigationButton};
 use crate::selector_plugin::{Selector, SpawnSelector};
-use crate::toggle_plugin::{SpawnToggle, Toggle};
+use crate::toggle_plugin::bundles::ToggleWidgetComponent;
 
 pub struct GameMenuPlugin;
 
@@ -30,13 +30,12 @@ pub fn setup_menu(mut commands: Commands) {
     commands.entity(parent).add_children(&[button_container]);
 
     let cool_toggle_entity = commands
-        .spawn_empty()
-        .queue(SpawnToggle::spawn(Toggle {
-            initial_value: true,
+        .spawn(ToggleWidgetComponent {
             label: "Cool?".into(),
+            current_value: true,
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
-        }))
+        })
         .id();
 
     let stuff_selector_entity = commands

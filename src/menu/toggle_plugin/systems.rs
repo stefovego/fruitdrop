@@ -63,21 +63,27 @@ pub fn selected_background(
 
 pub fn show_selection(
     mut toggle_button_query: Query<
-        (
-            &mut ToggleWidgetComponent,
-            &OnButtonEntity,
-            &OffButtonEntity,
-        ),
+        (Entity, &mut ToggleWidgetComponent),
         With<ToggleWidgetComponent>,
     >,
-    mut button_query: Query<&mut BorderColor>,
-    //mut button_query: Query<&mut BorderColor, With<Button>>,
+    children_query: Query<&Children>,
+    on_button_query: Query<Entity, With<OnButtonComponent>>,
+    off_button_query: Query<Entity, With<OffButtonComponent>>,
+    mut border_query: Query<&mut BorderColor>,
 ) {
-    for (toggle_component, OnButtonEntity(on_button), OffButtonEntity(off_button)) in
-        &mut toggle_button_query
-    {
-        let [mut off_button_border, mut on_button_border] = button_query
-            .get_many_mut([*off_button, *on_button])
+    for (widget_entity, toggle_component) in &mut toggle_button_query {
+        let on_button_entity = children_query
+            .iter_descendants(widget_entity)
+            .find(|child| on_button_query.get(*child).is_ok())
+            .unwrap();
+
+        let off_button_entity = children_query
+            .iter_descendants(widget_entity)
+            .find(|child| off_button_query.get(*child).is_ok())
+            .unwrap();
+
+        let [mut off_button_border, mut on_button_border] = border_query
+            .get_many_mut([off_button_entity, on_button_entity])
             .unwrap();
 
         if !toggle_component.current_value {
@@ -104,11 +110,14 @@ pub fn on_click_toggle(
             Interaction::Hovered => {}
             Interaction::None => {}
             Interaction::Pressed => {
-                if let Some(parent_entity) = parent_query.iter_ancestors(button_entity).nth(1) {
-                    if let Ok(mut toggle_component) = toggle_button_query.get_mut(parent_entity) {
-                        toggle_component.current_value = true;
-                    }
-                }
+                let toggle_widget_entity = parent_query
+                    .iter_ancestors(button_entity)
+                    .find(|parent| toggle_button_query.get(*parent).is_ok())
+                    .unwrap();
+
+                let mut toggle_component =
+                    toggle_button_query.get_mut(toggle_widget_entity).unwrap();
+                toggle_component.current_value = true;
             }
         }
     }
@@ -127,11 +136,14 @@ pub fn off_click_toggle(
             Interaction::Hovered => {}
             Interaction::None => {}
             Interaction::Pressed => {
-                if let Some(parent_entity) = parent_query.iter_ancestors(button_entity).nth(1) {
-                    if let Ok(mut toggle_component) = toggle_button_query.get_mut(parent_entity) {
-                        toggle_component.current_value = false;
-                    }
-                }
+                let toggle_widget_entity = parent_query
+                    .iter_ancestors(button_entity)
+                    .find(|parent| toggle_button_query.get(*parent).is_ok())
+                    .unwrap();
+
+                let mut toggle_component =
+                    toggle_button_query.get_mut(toggle_widget_entity).unwrap();
+                toggle_component.current_value = false;
             }
         }
     }
