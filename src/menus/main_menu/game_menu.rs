@@ -6,7 +6,7 @@ use bevy::prelude::*;
 
 use crate::navigation_button_plugin::{NavigationButton, SpawnNavigationButton};
 use crate::selector_plugin::{Selector, SpawnSelector};
-use crate::toggle_plugin::bundles::ToggleWidgetComponent;
+use crate::toggle_plugin::*;
 
 pub struct GameMenuPlugin;
 
