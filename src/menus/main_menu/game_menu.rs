@@ -5,7 +5,7 @@ use crate::my_colors;
 use bevy::prelude::*;
 
 use crate::navigation_button_plugin::{NavigationButton, SpawnNavigationButton};
-use crate::selector_plugin::{Selector, SpawnSelector};
+use crate::selector_plugin::*;
 use crate::toggle_plugin::*;
 
 pub struct GameMenuPlugin;
@@ -39,13 +39,13 @@ pub fn setup_menu(mut commands: Commands) {
         .id();
 
     let stuff_selector_entity = commands
-        .spawn_empty()
-        .queue(SpawnSelector::spawn(Selector {
+        .spawn(SelectorWidgetComponent {
+            current_index: 0,
             label: "Stuff".into(),
             selections: ["Stuff ONe".into(), "stuff 2".into(), "stuff3".into()].into(),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
-        }))
+        })
         .id();
 
     let back_button_entity = commands

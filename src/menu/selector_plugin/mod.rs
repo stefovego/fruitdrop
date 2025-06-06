@@ -1,27 +1,26 @@
-use bevy::ecs::system::EntityCommand;
-use bevy::prelude::*;
+use crate::menu::components::*;
+use bevy::{prelude::*, ui::FocusPolicy};
 
-pub mod bundles;
 pub mod systems;
 
-use bundles::*;
 use systems::*;
 
+// Plugin
+//
 pub struct SelectorPlugin;
-
 impl Plugin for SelectorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
-            selected_background.run_if(any_with_component::<SelectorWidgetComponent>),
-        )
-        .add_systems(
             Update,
             mouse_system.run_if(any_with_component::<SelectorWidgetComponent>),
         )
         .add_systems(
             Update,
             show_selection.run_if(any_with_component::<SelectorWidgetComponent>),
+        )
+        .add_systems(
+            Update,
+            selected_background.run_if(any_with_component::<SelectorWidgetComponent>),
         )
         .add_systems(
             Update,
@@ -34,174 +33,190 @@ impl Plugin for SelectorPlugin {
         .add_systems(
             Update,
             key_toggle.run_if(any_with_component::<SelectorWidgetComponent>),
-        );
+        )
+        .add_observer(add_selector_widget_observer);
     }
 }
 
-pub struct Selector {
-    pub label: String,
+// Components
+//
+#[derive(Component)]
+pub struct SelectedColor(pub Color);
+
+#[derive(Component)]
+pub struct UnselectedColor(pub Color);
+
+#[allow(dead_code)]
+#[derive(Component)]
+pub struct NextButtonEntity(pub Entity);
+
+#[allow(dead_code)]
+#[derive(Component)]
+pub struct PreviousButtonEntity(pub Entity);
+
+#[derive(Component)]
+pub struct CurrentSelectionEntity(pub Entity);
+
+#[derive(Component, Default)]
+#[require(
+    Name::new("Change Button"), 
+    FocusPolicy::Pass,
+    Button,
+    Node {
+        border: UiRect {
+            left: Val::Px(2.0),
+            right: Val::Px(2.0),
+            top: Val::Px(2.0),
+            bottom: Val::Px(2.0),
+        },
+        width: Val::Px(90.0),
+        height: Val::Px(90.0),
+        align_self: AlignSelf::Center,
+        justify_content: JustifyContent::Center,
+        ..default()
+    },
+)]
+pub struct ChangeButtonComponent;
+
+#[derive(Component)]
+pub struct NextComponent;
+
+#[derive(Component)]
+#[require(Name::new("Previous Button"), ChangeButtonComponent)]
+pub struct PreviousButtonComponent;
+
+#[derive(Component)]
+#[require(Name::new("Next Button"), ChangeButtonComponent)]
+pub struct NextButtonComponent;
+
+#[derive(Component)]
+#[require(
+    Name::new("Selector Widget"),
+    Button,
+    Selectables,
+    Node {
+        height: Val::Auto,
+        width: Val::Percent(100.0),
+        align_self: AlignSelf::Center,
+        justify_self: JustifySelf::Center,
+        margin: UiRect {
+            bottom: Val::Px(10.0),
+            ..default()
+        },
+        display: Display::Flex,
+        ..default()
+    },
+    SelectedColor(Color::NONE),
+    UnselectedColor(Color::NONE),
+)]
+pub struct SelectorWidgetComponent {
+    pub current_index: u32,
     pub selections: Vec<String>,
+    pub label: String,
     pub selected_color: Color,
     pub unselected_color: Color,
 }
 
-pub struct SpawnSelector {
-    pub selector: Selector,
-}
+#[derive(Component)]
+#[require(
+    Name::new("Current Selection"),
+    Node {
+        position_type: PositionType::Relative,
+        align_self: AlignSelf::Center,           // vertical
+        justify_self: JustifySelf::Center,       //horizontal
+        justify_content: JustifyContent::Center, //horizontal
+        height: Val::Percent(100.0),
+        width: Val::Percent(100.0),
+        display: Display::Flex,
+        ..default()
+    },
+)]
+pub struct CurrentSelectionComponent;
 
-impl SpawnSelector {
-    pub fn spawn(selector: Selector) -> Self {
-        Self { selector }
-    }
-}
-
-impl EntityCommand for SpawnSelector {
-    fn apply(self, mut entity_world: EntityWorldMut) {
-        let entity = entity_world.id();
-        entity_world.world_scope(move |world: &mut World| {
-            let selection_widget = world
-                .entity_mut(entity)
-                .insert(SelectionWidgetBundle {
-                    selected_color: SelectedColor(self.selector.selected_color),
-                    unselected_color: UnselectedColor(self.selector.unselected_color),
+// Observers
+//
+fn add_selector_widget_observer(
+    trigger: Trigger<OnAdd, SelectorWidgetComponent>,
+    mut commands: Commands,
+    selector_widget_query: Query<&SelectorWidgetComponent>,
+) {
+    let entity = trigger.target();
+    let selector_widget_component = selector_widget_query.get(entity).unwrap();
+    commands.entity(entity).insert((
+        SelectedColor(selector_widget_component.selected_color),
+        UnselectedColor(selector_widget_component.unselected_color),
+        BackgroundColor(selector_widget_component.unselected_color),
+        children![
+            (
+                Name::new("Label Container"),
+                Node {
+                    width: Val::Percent(35.0),
+                    justify_content: JustifyContent::Start,
+                    align_items: AlignItems::Center,
                     ..default()
-                })
-                .insert(BackgroundColor(self.selector.unselected_color))
-                .insert(Name::new("Selector Widget"))
-                .id();
-
-            let middle_spacer = world
-                .spawn(Node {
+                },
+                children![(
+                    Name::new("Label"),
+                    Text::new(&selector_widget_component.label),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 50.0,
+                        ..Default::default()
+                    },
+                )],
+            ),
+            (
+                Name::new("Middle Spacer"),
+                Node {
                     width: Val::Percent(20.0),
                     ..default()
-                })
-                .insert(Name::new("Middle Spacer"))
-                .id();
-
-            let selection_container = world
-                .spawn(Node {
+                }
+            ),
+            (
+                Name::new("Selection Container"),
+                Node {
                     width: Val::Percent(100.0),
                     column_gap: Val::Px(10.0),
                     justify_content: JustifyContent::SpaceEvenly,
                     ..default()
-                })
-                .insert(Name::new("Selection Container"))
-                .id();
-
-            let previous_button = world
-                .spawn(PreviousButtonBundle::default())
-                .insert(Name::new("Previous Button"))
-                .id();
-
-            let previous_label = world
-                .spawn((
-                    Text::new("<"),
-                    TextColor(Color::BLACK),
-                    TextFont {
-                        font_size: 50.0,
-                        ..Default::default()
-                    },
-                ))
-                // .insert(Style {
-                //     align_self: AlignSelf::Center,
-                //     ..default()
-                // })
-                .insert(Name::new("Previous Label"))
-                .id();
-
-            let next_button = world
-                .spawn(NextButtonBundle::default())
-                .insert(Name::new("Next Button"))
-                .id();
-
-            let next_label = world
-                .spawn((
-                    Text::new(">"),
-                    TextColor(Color::BLACK),
-                    TextFont {
-                        font_size: 50.0,
-                        ..Default::default()
-                    },
-                ))
-                //.insert(Style {
-                //    align_self: AlignSelf::Center,
-                //    ..default()
-                //})
-                .insert(Name::new("Next Button Label"))
-                .id();
-
-            let current_selection = world.spawn(CurrentSelectionBundle { ..default() }).id();
-
-            let current_selection_label = world
-                .spawn((
-                    Text::new(self.selector.selections.first().unwrap()),
-                    TextColor(Color::BLACK),
-                    TextFont {
-                        font_size: 50.0,
-                        ..Default::default()
-                    },
-                ))
-                // .insert(Style {
-                //     align_self: AlignSelf::Center,
-                //     ..default()
-                // })
-                .insert(Name::new("Current Selection Label"))
-                .id();
-
-            let label = world
-                .spawn((
-                    Text::new(self.selector.label),
-                    TextColor(Color::BLACK),
-                    TextFont {
-                        font_size: 50.0,
-                        ..Default::default()
-                    },
-                ))
-                .id();
-
-            let label_container = world
-                .spawn((
-                    Node {
-                        width: Val::Percent(35.0),
-                        justify_content: JustifyContent::Start,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    Name::new("Label Container"),
-                ))
-                .id();
-
-            world.entity_mut(previous_button).add_child(previous_label);
-
-            world.entity_mut(next_button).add_child(next_label);
-
-            world.entity_mut(label_container).add_child(label);
-
-            world
-                .entity_mut(current_selection)
-                .add_child(current_selection_label);
-
-            world
-                .entity_mut(selection_container)
-                .add_child(previous_button)
-                .add_child(current_selection)
-                .add_child(next_button);
-
-            world
-                .entity_mut(selection_widget)
-                .add_child(label_container)
-                .add_child(middle_spacer)
-                .add_child(selection_container);
-
-            world
-                .entity_mut(selection_widget)
-                .insert(SelectorWidgetComponent {
-                    current_index: 0,
-                    selections: self.selector.selections,
-                })
-                .insert(PreviousButtonEntity(previous_button))
-                .insert(NextButtonEntity(next_button))
-                .insert(CurrentSelectionEntity(current_selection_label));
-        });
-    }
+                },
+                children![
+                    (
+                        PreviousButtonComponent,
+                        children![(
+                            Name::new("Previous Label"),
+                            Text::new("<"),
+                            TextColor(Color::BLACK),
+                            TextFont {
+                                font_size: 50.0,
+                                ..Default::default()
+                            },
+                        )]
+                    ),
+                    (
+                        Name::new("Current Selection Label"),
+                        CurrentSelectionComponent,
+                        Text::new(selector_widget_component.selections.first().unwrap()),
+                        TextColor(Color::BLACK),
+                        TextFont {
+                            font_size: 50.0,
+                            ..Default::default()
+                        },
+                    ),
+                    (
+                        NextButtonComponent,
+                        children![(
+                            Name::new("Next Label"),
+                            Text::new(">"),
+                            TextColor(Color::BLACK),
+                            TextFont {
+                                font_size: 50.0,
+                                ..Default::default()
+                            },
+                        )]
+                    ),
+                ],
+            ),
+        ],
+    ));
 }
