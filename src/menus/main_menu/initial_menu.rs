@@ -3,8 +3,8 @@ use bevy::prelude::*;
 use crate::main_menu::menu_state::MainMenuState;
 use crate::menu::bundles::*;
 use crate::menu::components::*;
+use crate::menu::navigation_button_plugin::NavigationButtonWidgetComponent;
 use crate::my_colors;
-use crate::navigation_button_plugin::{NavigationButton, SpawnNavigationButton};
 use crate::AppState;
 
 pub struct InitialMenuPlugin;
@@ -35,33 +35,30 @@ pub fn setup_menu(mut commands: Commands) {
     commands.entity(parent).add_children(&[button_container]);
 
     let new_game_buttom_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("New Game"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::StartMenu,
-        }))
+        })
         .id();
 
     let options_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Options"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::OptionsMenu,
-        }))
+        })
         .id();
 
     let quit_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Quit"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::QuitGame,
-        }))
+        })
         .id();
 
     commands.entity(button_container).add_children(&[

@@ -3,9 +3,8 @@ use bevy::prelude::*;
 
 use crate::menu::bundles::*;
 use crate::menu::components::*;
-use crate::menu::navigation_button_plugin::{
-    ButtonPushed, NavigationButton, SpawnNavigationButton,
-};
+use crate::menu::navigation_button_plugin::ButtonPushed;
+use crate::menu::navigation_button_plugin::NavigationButtonWidgetComponent;
 use crate::my_colors;
 use crate::AppState;
 use crate::GameState;
@@ -33,24 +32,24 @@ pub fn setup_menu(mut commands: Commands) {
     commands.entity(parent).add_children(&[button_container]);
 
     let unpause_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Unpause"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: GameState::Playing,
-        }))
+        })
         .id();
+
     let quit_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Quit"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: GameState::Playing,
-        }))
+        })
         .observe(quit_button_observer)
         .id();
+
     commands
         .entity(button_container)
         .add_children(&[unpause_button_entity, quit_button_entity]);

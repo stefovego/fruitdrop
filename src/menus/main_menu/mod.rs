@@ -15,6 +15,8 @@ use self::initial_menu::InitialMenuPlugin;
 use self::options_menu::OptionsMenuPlugin;
 use self::start_menu::StartMenuPlugin;
 use self::video_menu::VideoMenuPlugin;
+use crate::game_state::{AppState, GameState};
+use crate::menu::navigation_button_plugin::NavigationButtonPlugin;
 
 pub struct MainMenuPlugin;
 
@@ -28,6 +30,9 @@ impl Plugin for MainMenuPlugin {
                 VideoMenuPlugin,
                 GameMenuPlugin,
                 StartMenuPlugin,
+                NavigationButtonPlugin::<GameState>::default(),
+                NavigationButtonPlugin::<MainMenuState>::default(),
+                NavigationButtonPlugin::<AppState>::default(),
             ))
             .add_systems(OnEnter(menu_state::MainMenuState::QuitGame), quit_system);
     }

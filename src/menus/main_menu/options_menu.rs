@@ -4,8 +4,8 @@ use crate::main_menu::MainMenuState;
 use crate::menu::bundles::*;
 use crate::menu::components::*;
 
+use crate::menu::navigation_button_plugin::NavigationButtonWidgetComponent;
 use crate::my_colors;
-use crate::navigation_button_plugin::{NavigationButton, SpawnNavigationButton};
 
 pub struct OptionsMenuPlugin;
 
@@ -30,33 +30,30 @@ pub fn setup_menu(mut commands: Commands) {
     commands.entity(parent).add_children(&[button_container]);
 
     let video_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Video"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::VideoMenu,
-        }))
+        })
         .id();
 
     let game_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Game"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::GameMenu,
-        }))
+        })
         .id();
 
     let back_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Back"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::InitialMenu,
-        }))
+        })
         .id();
 
     commands.entity(button_container).add_children(&[

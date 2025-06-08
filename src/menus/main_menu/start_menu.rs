@@ -3,11 +3,11 @@ use bevy::prelude::*;
 use crate::ball::resources::{BallScaler, GrowStats};
 use crate::menu::bundles::*;
 use crate::menu::components::*;
+use crate::menu::navigation_button_plugin::{ButtonPushed, NavigationButtonWidgetComponent};
 use crate::my_colors;
 use crate::AppState;
 
 use crate::main_menu::MainMenuState;
-use crate::navigation_button_plugin::{ButtonPushed, NavigationButton, SpawnNavigationButton};
 use crate::slider_plugin::bundles::SliderWidgetComponent;
 use crate::slider_plugin::{Slider, SpawnSlider};
 
@@ -45,13 +45,12 @@ pub fn setup_menu(
     commands.entity(parent).add_children(&[button_container]);
 
     let start_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Start Game"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: AppState::InGame,
-        }))
+        })
         .observe(start_button_observer)
         .id();
 
@@ -90,13 +89,12 @@ pub fn setup_menu(
         .id();
 
     let back_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Back"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::InitialMenu,
-        }))
+        })
         .id();
 
     commands.entity(button_container).add_children(&[

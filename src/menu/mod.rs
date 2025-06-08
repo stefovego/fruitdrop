@@ -17,7 +17,8 @@ pub struct MenuPlugin;
 
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(navigation_button_plugin::NavigationButtonPlugin)
+        app
+            //.add_plugins(navigation_button_plugin::NavigationButtonPlugin<T>)
             .add_plugins(selector_plugin::SelectorPlugin)
             .add_plugins(slider_plugin::SliderPlugin)
             .add_plugins(toggle_plugin::TogglePlugin)
@@ -30,13 +31,6 @@ impl Plugin for MenuPlugin {
 
 pub struct InsertWidgetCommand(Entity);
 
-// impl InsertWidgetCommand {
-//     pub fn spawn(wiget_entity: Entity) -> Self
-// where {
-//         Self(wiget_entity)
-//     }
-// }
-
 impl EntityCommand for InsertWidgetCommand {
     fn apply(self, mut entity_world: EntityWorldMut) {
         let entity = entity_world.id();
@@ -45,18 +39,3 @@ impl EntityCommand for InsertWidgetCommand {
         });
     }
 }
-
-//fn init_menu_entity<T>(mut commands: Commands) {
-//    let parent_node = ScreenParentBundle::default();
-//
-//    let button_container_node = ContainerBundle::default();
-//
-//    let parent = commands
-//        .spawn((StateScoped(MainMenuState::InitialMenu), parent_node))
-//        .insert(MenuComponent)
-//        .id();
-//
-//    let button_container = commands.spawn(button_container_node).id();
-//
-//    commands.entity(parent).add_children(&[button_container]);
-//}

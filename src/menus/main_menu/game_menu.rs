@@ -4,7 +4,7 @@ use crate::menu::components::*;
 use crate::my_colors;
 use bevy::prelude::*;
 
-use crate::navigation_button_plugin::{NavigationButton, SpawnNavigationButton};
+use crate::navigation_button_plugin::NavigationButtonWidgetComponent;
 use crate::selector_plugin::*;
 use crate::toggle_plugin::*;
 
@@ -49,13 +49,12 @@ pub fn setup_menu(mut commands: Commands) {
         .id();
 
     let back_button_entity = commands
-        .spawn_empty()
-        .queue(SpawnNavigationButton::spawn(NavigationButton {
+        .spawn(NavigationButtonWidgetComponent {
             text: String::from("Back"),
             selected_color: my_colors::BLUE,
             unselected_color: my_colors::PURPLE,
             next_state: MainMenuState::OptionsMenu,
-        }))
+        })
         .id();
 
     commands.entity(button_container).add_children(&[
