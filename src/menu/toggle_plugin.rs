@@ -71,7 +71,6 @@ pub struct ToggleWidgetComponent {
 }
 #[derive(Component)]
 #[require(
-
     Node {
         border: UiRect {
             left: Val::Px(2.0),

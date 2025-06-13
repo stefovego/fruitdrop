@@ -4,12 +4,11 @@ use crate::ball::resources::{BallScaler, GrowStats};
 use crate::menu::bundles::*;
 use crate::menu::components::*;
 use crate::menu::navigation_button_plugin::{ButtonPushed, NavigationButtonWidgetComponent};
+use crate::menu::slider_plugin::SliderWidgetComponent;
 use crate::my_colors;
 use crate::AppState;
 
 use crate::main_menu::MainMenuState;
-use crate::slider_plugin::bundles::SliderWidgetComponent;
-use crate::slider_plugin::{Slider, SpawnSlider};
 
 #[derive(Component)]
 pub struct SmallestBallSize;
@@ -32,7 +31,7 @@ pub fn setup_menu(
 ) {
     let parent_node = ScreenParentBundle::default();
 
-    let button_container_node = ContainerBundle::default();
+    let button_container_node = WidgetContainerBundle::default();
 
     let parent = commands
         .spawn((StateScoped(MainMenuState::StartMenu), parent_node))
@@ -55,11 +54,10 @@ pub fn setup_menu(
         .id();
 
     let ball_size_slider_entity = commands
-        .spawn_empty()
-        .queue(SpawnSlider::spawn(
-            Slider {
+        .spawn((
+            SliderWidgetComponent {
                 label: "Smallest Ball Size".into(),
-                initial_value: ball_scaler.initial_size as u32,
+                current_value: ball_scaler.initial_size as u32,
                 step_size: 3,
                 min: 0,
                 max: 120,
@@ -72,11 +70,10 @@ pub fn setup_menu(
         .id();
 
     let grow_speed_slider_entity = commands
-        .spawn_empty()
-        .queue(SpawnSlider::spawn(
-            Slider {
+        .spawn((
+            SliderWidgetComponent {
                 label: "Grow Speed".into(),
-                initial_value: grow_stats.grow_speed as u32,
+                current_value: grow_stats.grow_speed as u32,
                 step_size: 1,
                 min: 0,
                 max: 120,

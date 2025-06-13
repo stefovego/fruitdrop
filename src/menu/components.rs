@@ -4,7 +4,7 @@ use bevy::prelude::*;
 pub struct MenuComponent;
 
 #[derive(Component)]
-pub struct ContainerComponent;
+pub struct WidgetContainerComponent;
 
 #[derive(Component)]
 pub struct SelectedComponent;
@@ -12,5 +12,5 @@ pub struct SelectedComponent;
 #[derive(Component, Default)]
 pub struct Selectables;
 
-#[derive(Component)]
+#[derive(Component, Reflect)]
 pub struct SelectedEnt(pub Entity);

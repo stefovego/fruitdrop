@@ -5,7 +5,7 @@ pub fn key_input(
     keys: Res<ButtonInput<KeyCode>>,
     selected_items: Query<(Entity, &SelectedEnt), With<MenuComponent>>,
     menu_query: Query<Entity, With<MenuComponent>>,
-    container_query: Query<&Children, With<ContainerComponent>>,
+    container_query: Query<&Children, With<WidgetContainerComponent>>,
     items_query: Query<Entity, With<Selectables>>,
     mut commands: Commands,
 ) {

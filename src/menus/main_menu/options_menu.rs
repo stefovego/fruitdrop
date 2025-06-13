@@ -18,7 +18,7 @@ impl Plugin for OptionsMenuPlugin {
 pub fn setup_menu(mut commands: Commands) {
     let parent_node = ScreenParentBundle::default();
 
-    let button_container_node = ContainerBundle::default();
+    let button_container_node = WidgetContainerBundle::default();
 
     let parent = commands
         .spawn((StateScoped(MainMenuState::OptionsMenu), parent_node))

@@ -11,13 +11,14 @@ pub mod toggle_plugin;
 
 mod systems;
 use self::components::MenuComponent;
+use self::components::SelectedEnt;
 use self::systems::*;
 
 pub struct MenuPlugin;
 
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app.register_type::<SelectedEnt>()
             //.add_plugins(navigation_button_plugin::NavigationButtonPlugin<T>)
             .add_plugins(selector_plugin::SelectorPlugin)
             .add_plugins(slider_plugin::SliderPlugin)

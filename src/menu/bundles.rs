@@ -1,7 +1,7 @@
 use crate::my_colors;
 use bevy::prelude::*;
 
-use super::components::ContainerComponent;
+use super::components::WidgetContainerComponent;
 
 #[derive(Bundle)]
 pub struct ScreenParentBundle {
@@ -31,14 +31,16 @@ impl Default for ScreenParentBundle {
 }
 
 #[derive(Bundle)]
-pub struct ContainerBundle {
+pub struct WidgetContainerBundle {
+    name: Name,
     node: Node,
-    container: ContainerComponent,
+    container: WidgetContainerComponent,
 }
 
-impl Default for ContainerBundle {
+impl Default for WidgetContainerBundle {
     fn default() -> Self {
         Self {
+            name: Name::new("Widget Container"),
             node: Node {
                 position_type: PositionType::Relative,
                 display: Display::Flex,
@@ -49,7 +51,7 @@ impl Default for ContainerBundle {
                 align_items: AlignItems::Center,
                 ..default()
             },
-            container: ContainerComponent,
+            container: WidgetContainerComponent,
         }
     }
 }
