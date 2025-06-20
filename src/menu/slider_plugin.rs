@@ -1,4 +1,4 @@
-use crate::menu::components::*;
+use crate::menu::{MenuComponent, Selectables, SelectedEnt};
 use bevy::prelude::*;
 
 use bevy::ui::{FocusPolicy, RelativeCursorPosition};
@@ -150,91 +150,68 @@ fn slider_widget_component_observer(
     let entity = trigger.target();
     let slider_widget_component = toggle_widget_query.get(entity).unwrap();
 
-    commands
-        .entity(entity)
-        .insert((
-            SelectedColor(slider_widget_component.selected_color),
-            UnselectedColor(slider_widget_component.unselected_color),
-            BackgroundColor(slider_widget_component.unselected_color),
-            children![(
-                SliderContainerComponent,
-                children![
-                    (
-                        Name::new("Slider Label Container"),
-                        Node {
-                            width: Val::Percent(35.0),
-                            justify_content: JustifyContent::Start,
-                            align_items: AlignItems::Center,
-                            ..default()
+    commands.entity(entity).insert((
+        SelectedColor(slider_widget_component.selected_color),
+        UnselectedColor(slider_widget_component.unselected_color),
+        BackgroundColor(slider_widget_component.unselected_color),
+        children![(
+            SliderContainerComponent,
+            children![
+                (
+                    Name::new("Slider Label Container"),
+                    Node {
+                        width: Val::Percent(35.0),
+                        justify_content: JustifyContent::Start,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    children![(
+                        Name::new("Slider Label"),
+                        Text::new(slider_widget_component.label.clone()),
+                        TextColor(Color::BLACK),
+                        TextFont {
+                            font_size: 50.0,
+                            ..Default::default()
                         },
-                        children![(
-                            Name::new("Slider Label"),
-                            Text::new(slider_widget_component.label.clone()),
-                            TextColor(Color::BLACK),
-                            TextFont {
-                                font_size: 50.0,
-                                ..Default::default()
-                            },
-                        )],
-                    ),
-                    (
-                        Name::new("Slider Track Container"),
-                        Node {
-                            width: Val::Percent(40.0),
-                            ..default()
+                    )],
+                ),
+                (
+                    Name::new("Slider Track Container"),
+                    Node {
+                        width: Val::Percent(40.0),
+                        ..default()
+                    },
+                    children![
+                        (
+                            Name::new("Slider Track"),
+                            SliderTrackComponent,
+                            RelativeCursorPosition::default(),
+                            BackgroundColor(slider_widget_component.track_color)
+                        ),
+                        (Name::new("Slider Knob"), SliderKnobComponent),
+                    ],
+                ),
+                (
+                    Name::new("Slider Readout Container"),
+                    Node {
+                        width: Val::Percent(25.0),
+                        justify_content: JustifyContent::End,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    children![(
+                        ReadOut,
+                        Text::new("0"),
+                        TextColor(Color::BLACK),
+                        TextFont {
+                            font_size: 150.0,
+                            ..Default::default()
                         },
-                        children![
-                            (
-                                Name::new("Slider Track"),
-                                SliderTrackComponent,
-                                RelativeCursorPosition::default(),
-                                BackgroundColor(slider_widget_component.track_color)
-                            ),
-                            (Name::new("Slider Knob"), SliderKnobComponent),
-                        ],
-                    ),
-                    (
-                        Name::new("Slider Readout Container"),
-                        Node {
-                            width: Val::Percent(25.0),
-                            justify_content: JustifyContent::End,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        children![(
-                            ReadOut,
-                            Text::new("0"),
-                            TextColor(Color::BLACK),
-                            TextFont {
-                                font_size: 150.0,
-                                ..Default::default()
-                            },
-                        )],
-                    )
-                ],
-            )],
-        ))
-        .observe(widget_mouse_over_observer)
-        .observe(widget_mouse_out_observer);
-}
-
-pub fn widget_mouse_over_observer(
-    trigger: Trigger<Pointer<Over>>,
-    mut commands: Commands,
-    menu_query: Query<Entity, With<MenuComponent>>,
-) {
-    let entity = trigger.target();
-    let menu_entity = menu_query.single().unwrap();
-    commands.entity(menu_entity).insert(SelectedEnt(entity));
-}
-
-pub fn widget_mouse_out_observer(
-    _trigger: Trigger<Pointer<Out>>,
-    mut commands: Commands,
-    menu_query: Query<Entity, With<MenuComponent>>,
-) {
-    let menu_entity = menu_query.single().unwrap();
-    commands.entity(menu_entity).remove::<SelectedEnt>();
+                    )],
+                )
+            ],
+        )],
+    ));
 }
 
 pub fn track_clicked_observer(

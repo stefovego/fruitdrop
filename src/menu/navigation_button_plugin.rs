@@ -1,11 +1,11 @@
 use std::marker::PhantomData;
 
-use crate::menu::components::*;
-use bevy::ecs::system::EntityCommand;
+// use crate::menu::components::*;
 use bevy::prelude::*;
 
 use bevy::state::state::FreelyMutableState;
 
+use crate::menu::{MenuComponent, Selectables, SelectedEnt};
 use crate::my_colors;
 
 #[derive(Event)]
@@ -18,10 +18,6 @@ pub struct NavigationButtonPlugin<T> {
 impl<T: States + FreelyMutableState> Plugin for NavigationButtonPlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
-            mouse_system::<T>.run_if(any_with_component::<NavigationButtonWidgetComponent<T>>),
-        )
-        .add_systems(
             Update,
             selected_background::<T>
                 .run_if(any_with_component::<NavigationButtonWidgetComponent<T>>),
@@ -74,6 +70,16 @@ pub struct UnselectedColor(pub Color);
 
 // Observers
 //
+pub fn button_clicked_observer<T: States + FreelyMutableState>(
+    trigger: Trigger<Pointer<Click>>,
+    mut next_states: ResMut<NextState<T>>,
+    selector_widget_query: Query<&NavigationButtonWidgetComponent<T>>,
+) {
+    let entity = trigger.target();
+    let naviagation_button_widget_component = selector_widget_query.get(entity).unwrap();
+    next_states.set(naviagation_button_widget_component.next_state.clone());
+}
+
 fn add_navigation_button_widget_observer<T: States + FreelyMutableState>(
     trigger: Trigger<OnAdd, NavigationButtonWidgetComponent<T>>,
     mut commands: Commands,
@@ -95,7 +101,10 @@ fn add_navigation_button_widget_observer<T: States + FreelyMutableState>(
             },
         )],
     ));
-    commands.entity(entity).observe(button_pushed_observer::<T>);
+    commands
+        .entity(entity)
+        .observe(button_pushed_observer::<T>)
+        .observe(button_clicked_observer::<T>);
 }
 
 fn button_pushed_observer<T: States + FreelyMutableState>(
@@ -140,41 +149,12 @@ pub fn selected_background<T: States>(
     }
 }
 
-pub fn mouse_system<T: States>(
-    mut interaction_query: Query<
-        (Entity, &Interaction),
-        (
-            Changed<Interaction>,
-            With<NavigationButtonWidgetComponent<T>>,
-        ),
-    >,
-    parent_query: Query<Entity, With<MenuComponent>>,
-    mut commands: Commands,
-) {
-    let parent_entity = parent_query.single().unwrap();
-    for (entity, interaction) in &mut interaction_query {
-        match *interaction {
-            Interaction::Hovered => {
-                commands.entity(parent_entity).insert(SelectedEnt(entity));
-            }
-            Interaction::None => {}
-            Interaction::Pressed => {
-                commands.trigger_targets(ButtonPushed, entity);
-            }
-        }
-    }
-}
-
 pub fn keyboard_select(
     keys: Res<ButtonInput<KeyCode>>,
-    parent_query: Query<&SelectedEnt, With<MenuComponent>>,
+    selected_widget: Single<&SelectedEnt, With<MenuComponent>>,
     mut commands: Commands,
 ) {
-    if parent_query.is_empty() {
-        return;
-    }
-
-    let SelectedEnt(currently_selected) = parent_query.single().unwrap();
+    let SelectedEnt(currently_selected) = selected_widget.into_inner();
 
     if keys.just_pressed(KeyCode::Enter) {
         commands.trigger_targets(ButtonPushed, *currently_selected);

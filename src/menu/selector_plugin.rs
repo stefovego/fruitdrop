@@ -1,5 +1,6 @@
-use crate::menu::components::*;
 use bevy::{prelude::*, ui::FocusPolicy};
+
+use crate::menu::{MenuComponent, Selectables, SelectedEnt};
 
 // Plugin
 //
@@ -7,10 +8,6 @@ pub struct SelectorPlugin;
 impl Plugin for SelectorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
-            mouse_system.run_if(any_with_component::<SelectorWidgetComponent>),
-        )
-        .add_systems(
             Update,
             show_selection.run_if(any_with_component::<SelectorWidgetComponent>),
         )
@@ -49,9 +46,6 @@ pub struct NextButtonEntity(pub Entity);
 #[allow(dead_code)]
 #[derive(Component)]
 pub struct PreviousButtonEntity(pub Entity);
-
-#[derive(Component)]
-pub struct CurrentSelectionEntity(pub Entity);
 
 #[derive(Component, Default)]
 #[require(
@@ -219,28 +213,6 @@ fn add_selector_widget_observer(
 
 // Systems
 //
-pub fn mouse_system(
-    mut commands: Commands,
-    mut interaction_query: Query<
-        (Entity, &Interaction),
-        (Changed<Interaction>, With<SelectorWidgetComponent>),
-    >,
-    parent_query: Query<Entity, With<MenuComponent>>,
-) {
-    let parent_entity = parent_query.single().unwrap();
-    for (entity, interaction) in &mut interaction_query {
-        match *interaction {
-            Interaction::Hovered => {
-                commands.entity(parent_entity).insert(SelectedEnt(entity));
-            }
-            Interaction::None => {
-                commands.entity(parent_entity).remove::<SelectedEnt>();
-            }
-            Interaction::Pressed => {}
-        }
-    }
-}
-
 pub fn selected_background(
     mut widget_query: Query<
         (

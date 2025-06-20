@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
 use crate::main_menu::menu_state::MainMenuState;
-use crate::menu::bundles::*;
-use crate::menu::components::*;
 use crate::menu::navigation_button_plugin::NavigationButtonWidgetComponent;
+use crate::menu::MenuComponent;
+use crate::menu::WidgetContainerComponent;
 use crate::my_colors;
 use crate::AppState;
 
@@ -17,53 +17,32 @@ impl Plugin for InitialMenuPlugin {
 }
 
 pub fn setup_menu(mut commands: Commands) {
-    let parent_node = ScreenParentBundle::default();
-
-    let button_container_node = WidgetContainerBundle::default();
-
-    let parent = commands
-        .spawn((StateScoped(MainMenuState::InitialMenu), parent_node))
-        .insert(MenuComponent)
-        .insert(Name::new("Menu Screen"))
-        .id();
-
-    let button_container = commands
-        .spawn(button_container_node)
-        .insert(Name::new("Button Container"))
-        .id();
-
-    commands.entity(parent).add_children(&[button_container]);
-
-    let new_game_buttom_entity = commands
-        .spawn(NavigationButtonWidgetComponent {
-            text: String::from("New Game"),
-            selected_color: my_colors::BLUE,
-            unselected_color: my_colors::PURPLE,
-            next_state: MainMenuState::StartMenu,
-        })
-        .id();
-
-    let options_button_entity = commands
-        .spawn(NavigationButtonWidgetComponent {
-            text: String::from("Options"),
-            selected_color: my_colors::BLUE,
-            unselected_color: my_colors::PURPLE,
-            next_state: MainMenuState::OptionsMenu,
-        })
-        .id();
-
-    let quit_button_entity = commands
-        .spawn(NavigationButtonWidgetComponent {
-            text: String::from("Quit"),
-            selected_color: my_colors::BLUE,
-            unselected_color: my_colors::PURPLE,
-            next_state: MainMenuState::QuitGame,
-        })
-        .id();
-
-    commands.entity(button_container).add_children(&[
-        new_game_buttom_entity,
-        options_button_entity,
-        quit_button_entity,
-    ]);
+    commands.spawn((
+        Name::new("Menu Screen"),
+        MenuComponent,
+        StateScoped(MainMenuState::InitialMenu),
+        children![(
+            WidgetContainerComponent,
+            children![
+                NavigationButtonWidgetComponent {
+                    text: String::from("New Game"),
+                    selected_color: my_colors::BLUE,
+                    unselected_color: my_colors::PURPLE,
+                    next_state: MainMenuState::StartMenu,
+                },
+                NavigationButtonWidgetComponent {
+                    text: String::from("Options"),
+                    selected_color: my_colors::BLUE,
+                    unselected_color: my_colors::PURPLE,
+                    next_state: MainMenuState::OptionsMenu,
+                },
+                NavigationButtonWidgetComponent {
+                    text: String::from("Quit"),
+                    selected_color: my_colors::BLUE,
+                    unselected_color: my_colors::PURPLE,
+                    next_state: MainMenuState::QuitGame,
+                },
+            ]
+        )],
+    ));
 }

@@ -1,10 +1,10 @@
 use super::menu_state::PauseMenuState;
 use bevy::prelude::*;
 
-use crate::menu::bundles::*;
-use crate::menu::components::*;
 use crate::menu::navigation_button_plugin::ButtonPushed;
 use crate::menu::navigation_button_plugin::NavigationButtonWidgetComponent;
+use crate::menu::MenuComponent;
+use crate::menu::WidgetContainerComponent;
 use crate::my_colors;
 use crate::AppState;
 use crate::GameState;
@@ -18,16 +18,15 @@ impl Plugin for InitialMenuPlugin {
 }
 
 pub fn setup_menu(mut commands: Commands) {
-    let parent_node = ScreenParentBundle::default();
-
-    let button_container_node = WidgetContainerBundle::default();
-
     let parent = commands
-        .spawn((StateScoped(GameState::Paused), parent_node))
-        .insert(MenuComponent)
+        .spawn((
+            Name::new("Initial Pause Menu"),
+            StateScoped(GameState::Paused),
+            MenuComponent,
+        ))
         .id();
 
-    let button_container = commands.spawn(button_container_node).id();
+    let button_container = commands.spawn(WidgetContainerComponent).id();
 
     commands.entity(parent).add_children(&[button_container]);
 

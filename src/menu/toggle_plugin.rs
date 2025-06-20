@@ -1,5 +1,7 @@
-use crate::menu::components::*;
-use crate::my_colors;
+use crate::{
+    menu::{MenuComponent, Selectables, SelectedEnt},
+    my_colors,
+};
 use bevy::prelude::*;
 
 // Plugin
@@ -8,10 +10,6 @@ pub struct TogglePlugin;
 impl Plugin for TogglePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
-            mouse_system.run_if(any_with_component::<ToggleWidgetComponent>),
-        )
-        .add_systems(
             Update,
             show_selection.run_if(any_with_component::<ToggleWidgetComponent>),
         )
@@ -172,30 +170,6 @@ fn toggle_widget_component_toggle(
             )
         ],
     ));
-}
-
-// Systems
-//
-pub fn mouse_system(
-    mut commands: Commands,
-    mut interaction_query: Query<
-        (Entity, &Interaction),
-        (Changed<Interaction>, With<ToggleWidgetComponent>),
-    >,
-    parent_query: Query<Entity, With<MenuComponent>>,
-) {
-    let parent_entity = parent_query.single().unwrap();
-    for (entity, interaction) in &mut interaction_query {
-        match *interaction {
-            Interaction::Hovered => {
-                commands.entity(parent_entity).insert(SelectedEnt(entity));
-            }
-            Interaction::None => {
-                commands.entity(parent_entity).remove::<SelectedEnt>();
-            }
-            Interaction::Pressed => {}
-        }
-    }
 }
 
 pub fn selected_background(

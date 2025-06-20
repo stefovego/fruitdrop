@@ -1,10 +1,9 @@
 use bevy::prelude::*;
 
 use crate::ball::resources::{BallScaler, GrowStats};
-use crate::menu::bundles::*;
-use crate::menu::components::*;
 use crate::menu::navigation_button_plugin::{ButtonPushed, NavigationButtonWidgetComponent};
 use crate::menu::slider_plugin::SliderWidgetComponent;
+use crate::menu::{MenuComponent, WidgetContainerComponent};
 use crate::my_colors;
 use crate::AppState;
 
@@ -16,90 +15,25 @@ pub struct SmallestBallSize;
 #[derive(Component)]
 pub struct GrowSpeed;
 
+#[derive(Component)]
+pub struct StartButtonComponent;
+
 pub struct StartMenuPlugin;
 
 impl Plugin for StartMenuPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(MainMenuState::StartMenu), setup_menu);
+        app.add_systems(OnEnter(MainMenuState::StartMenu), setup_menu)
+            .add_observer(start_button_component_observer);
     }
 }
-
-pub fn setup_menu(
+pub fn start_button_component_observer(
+    trigger: Trigger<OnAdd, StartButtonComponent>,
     mut commands: Commands,
-    ball_scaler: Res<BallScaler>,
-    grow_stats: Res<GrowStats>,
 ) {
-    let parent_node = ScreenParentBundle::default();
+    // Get the entity
+    let entity = trigger.target();
 
-    let button_container_node = WidgetContainerBundle::default();
-
-    let parent = commands
-        .spawn((StateScoped(MainMenuState::StartMenu), parent_node))
-        .insert(MenuComponent)
-        .insert(Name::new("Start Menu"))
-        .id();
-
-    let button_container = commands.spawn(button_container_node).id();
-
-    commands.entity(parent).add_children(&[button_container]);
-
-    let start_button_entity = commands
-        .spawn(NavigationButtonWidgetComponent {
-            text: String::from("Start Game"),
-            selected_color: my_colors::BLUE,
-            unselected_color: my_colors::PURPLE,
-            next_state: AppState::InGame,
-        })
-        .observe(start_button_observer)
-        .id();
-
-    let ball_size_slider_entity = commands
-        .spawn((
-            SliderWidgetComponent {
-                label: "Smallest Ball Size".into(),
-                current_value: ball_scaler.initial_size as u32,
-                step_size: 3,
-                min: 0,
-                max: 120,
-                selected_color: my_colors::BLUE,
-                unselected_color: my_colors::PURPLE,
-                track_color: my_colors::PINK,
-            },
-            SmallestBallSize,
-        ))
-        .id();
-
-    let grow_speed_slider_entity = commands
-        .spawn((
-            SliderWidgetComponent {
-                label: "Grow Speed".into(),
-                current_value: grow_stats.grow_speed as u32,
-                step_size: 1,
-                min: 0,
-                max: 120,
-                selected_color: my_colors::BLUE,
-                unselected_color: my_colors::PURPLE,
-                track_color: my_colors::PINK,
-            },
-            GrowSpeed,
-        ))
-        .id();
-
-    let back_button_entity = commands
-        .spawn(NavigationButtonWidgetComponent {
-            text: String::from("Back"),
-            selected_color: my_colors::BLUE,
-            unselected_color: my_colors::PURPLE,
-            next_state: MainMenuState::InitialMenu,
-        })
-        .id();
-
-    commands.entity(button_container).add_children(&[
-        start_button_entity,
-        ball_size_slider_entity,
-        grow_speed_slider_entity,
-        back_button_entity,
-    ]);
+    commands.entity(entity).observe(start_button_observer);
 }
 
 pub fn start_button_observer(
@@ -113,4 +47,63 @@ pub fn start_button_observer(
     let grow_speed_slider_value = grow_speed_slider_query.single().unwrap();
     ball_scaler_stats.initial_size = size_slider_value.current_value as f32;
     grow_stats.grow_speed = grow_speed_slider_value.current_value as f32;
+}
+
+pub fn setup_menu(
+    mut commands: Commands,
+    ball_scaler: Res<BallScaler>,
+    grow_stats: Res<GrowStats>,
+) {
+    commands.spawn((
+        Name::new("Start Menu"),
+        StateScoped(MainMenuState::StartMenu),
+        MenuComponent,
+        children![(
+            WidgetContainerComponent,
+            children![
+                (
+                    StartButtonComponent,
+                    NavigationButtonWidgetComponent {
+                        text: String::from("Start Game"),
+                        selected_color: my_colors::BLUE,
+                        unselected_color: my_colors::PURPLE,
+                        next_state: AppState::InGame,
+                    }
+                ),
+                //.observe(start_button_observer)
+                (
+                    SliderWidgetComponent {
+                        label: "Smallest Ball Size".into(),
+                        current_value: ball_scaler.initial_size as u32,
+                        step_size: 3,
+                        min: 0,
+                        max: 120,
+                        selected_color: my_colors::BLUE,
+                        unselected_color: my_colors::PURPLE,
+                        track_color: my_colors::PINK,
+                    },
+                    SmallestBallSize,
+                ),
+                (
+                    SliderWidgetComponent {
+                        label: "Grow Speed".into(),
+                        current_value: grow_stats.grow_speed as u32,
+                        step_size: 1,
+                        min: 0,
+                        max: 120,
+                        selected_color: my_colors::BLUE,
+                        unselected_color: my_colors::PURPLE,
+                        track_color: my_colors::PINK,
+                    },
+                    GrowSpeed,
+                ),
+                NavigationButtonWidgetComponent {
+                    text: String::from("Back"),
+                    selected_color: my_colors::BLUE,
+                    unselected_color: my_colors::PURPLE,
+                    next_state: MainMenuState::InitialMenu,
+                },
+            ]
+        )],
+    ));
 }
