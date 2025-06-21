@@ -54,7 +54,7 @@ fn tear_down(mut commands: Commands, ball_query: Query<Entity, With<Dropper>>) {
 fn loaded_ball_change(
     mut commands: Commands,
     loaded_ball: Res<LoadedBall>,
-    mut load_ball_query: Single<(&ChildOf, Entity), With<LoadedBallComponent>>,
+    load_ball_query: Single<(&ChildOf, Entity), With<LoadedBallComponent>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     ball_scaler: Res<BallScaler>,

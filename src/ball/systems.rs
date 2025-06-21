@@ -1,7 +1,4 @@
-use avian2d::collision::collider;
 use avian2d::prelude::*;
-use bevy::animation::{animated_field, AnimationTarget, AnimationTargetId};
-use bevy::ecs::system::SystemParam;
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 use rand::Rng;
@@ -13,7 +10,7 @@ use crate::dropper::resources::{DropperStats, LoadedBall};
 use crate::game_board::GameBoard;
 use crate::handle_input::Action;
 use crate::loserbox::LoserBox;
-use crate::material_color_animation::{AnimatedColor, MaterialColorAnimation};
+use crate::material_color_animation::AnimatedColor;
 use crate::ondeck::OnDeckBall;
 use crate::physics::Layer;
 use crate::score::PlayerScore;
@@ -65,25 +62,19 @@ pub fn seed_systems(
     }
 }
 
+#[allow(dead_code)]
 pub fn collision_observer(
     trigger: Trigger<OnCollisionStart>,
-    // ball_query: Query<(&BallLevel), With<Ball>>,
-    // ball_colors: Res<BallColors>,
-    // mut player_score: ResMut<PlayerScore>,
     mut commands: Commands,
-    mut ball_query: Query<(&Transform, &mut BallLevel), With<Ball>>,
-    mut collision_events: EventReader<CollisionStarted>,
+    ball_query: Query<(&Transform, &mut BallLevel), With<Ball>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut player_score: ResMut<PlayerScore>,
     ball_scaler: Res<BallScaler>,
     grow_stats: Res<GrowStats>,
-    mut animations: ResMut<Assets<AnimationClip>>,
-    mut graphs: ResMut<Assets<AnimationGraph>>,
     ball_colors: Res<BallColors>,
     game_board: Single<Entity, With<GameBoard>>,
 ) {
-    info!("wtf");
     // Maybe catch a observerer trying run on a despawned entity
     if !ball_query.contains(trigger.body.unwrap()) {
         return;
@@ -127,8 +118,6 @@ pub fn collision_observer(
         &game_board,
         &mut meshes,
         &mut materials,
-        &mut animations,
-        &mut graphs,
         &grow_stats,
         new_ball_size,
         ball_color,
@@ -148,8 +137,6 @@ pub fn handle_collisions(
     mut player_score: ResMut<PlayerScore>,
     ball_scaler: Res<BallScaler>,
     grow_stats: Res<GrowStats>,
-    mut animations: ResMut<Assets<AnimationClip>>,
-    mut graphs: ResMut<Assets<AnimationGraph>>,
     ball_colors: Res<BallColors>,
     game_board: Single<Entity, With<GameBoard>>,
 ) {
@@ -192,8 +179,6 @@ pub fn handle_collisions(
             &game_board,
             &mut meshes,
             &mut materials,
-            &mut animations,
-            &mut graphs,
             &grow_stats,
             new_ball_size,
             ball_color,
@@ -211,8 +196,6 @@ pub fn spawn_new_ball(
     game_board: &Single<Entity, With<GameBoard>>,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<ColorMaterial>>,
-    animations: &mut ResMut<Assets<AnimationClip>>,
-    graphs: &mut ResMut<Assets<AnimationGraph>>,
     grow_stats: &Res<GrowStats>,
     ball_size: f32,
     ball_color: Color,
@@ -221,8 +204,6 @@ pub fn spawn_new_ball(
     next_level: usize,
     grow_speed: f32,
 ) {
-    let name_component = Name::new("Ball");
-
     let ball_entity = commands
         .spawn((
             Ball,

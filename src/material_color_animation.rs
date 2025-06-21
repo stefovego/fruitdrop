@@ -2,7 +2,6 @@ use std::any::TypeId;
 
 use bevy::{
     animation::{animated_field, AnimationEvaluationError, AnimationTarget, AnimationTargetId},
-    ecs::component::HookContext,
     prelude::*,
 };
 
