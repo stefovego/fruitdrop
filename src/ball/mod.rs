@@ -8,6 +8,7 @@ use bevy::prelude::*;
 use bevy::sprite::Material2dPlugin;
 
 use crate::ball::{materials::BallMaterial, resources::*, systems::*};
+use crate::dropper::plugin::UpdateDropperSet;
 use crate::game_state::{AppState, GameState};
 use crate::material_color_animation::MaterialColorAnimationSet;
 
@@ -56,7 +57,9 @@ impl Plugin for BallPlugin {
             ]))
             .add_systems(
                 Update,
-                spawn_ball.run_if(in_state(AppState::InGame)), //.run_if(in_state(GameState::Playing))
+                spawn_ball
+                    .after(UpdateDropperSet)
+                    .run_if(in_state(AppState::InGame)), //.run_if(in_state(GameState::Playing))
             )
             .add_systems(
                 Update,

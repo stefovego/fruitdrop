@@ -14,6 +14,9 @@ use crate::walls::LEVEL_WIDTH;
 #[derive(SystemSet, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct InitDropperSet;
 
+#[derive(SystemSet, Debug, Clone, Eq, PartialEq, Hash)]
+pub struct UpdateDropperSet;
+
 const MAX_DROPPABLE_LEVEL: usize = 4;
 
 pub struct DropperPlugin;
@@ -33,7 +36,8 @@ impl Plugin for DropperPlugin {
                 Update,
                 (dropper_movement, mouse_system, restrict_dropper_movement)
                     .chain()
-                    .run_if(in_state(GameState::Playing)),
+                    .run_if(in_state(GameState::Playing))
+                    .in_set(UpdateDropperSet),
             )
             .add_systems(
                 Update,
@@ -73,8 +77,8 @@ fn loaded_ball_change(
             Mesh2d(meshes.add(Circle::new(ball_size))),
             MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
             Transform::from_xyz(0.0, 0., 1.),
+            LoadedBallComponent,
         ))
-        .insert(LoadedBallComponent)
         .id();
 
     commands
@@ -99,48 +103,44 @@ fn spawn_dropper(
 
     // Spawn The Dropper Entity itself
     commands.entity(*game_board).with_children(|parent| {
-        parent
-            .spawn((
-                Transform::from_xyz(0.0, 400.0, 0.0),
-                Name::new("Dropper"),
-                Visibility::Visible,
-                Dropper,
-            ))
-            .with_children(|parent| {
-                parent.spawn((
-                    Name::new("Ball Preview"),
-                    Mesh2d(meshes.add(Circle::new(ball_size))),
-                    MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
-                    Transform::from_xyz(0.0, 0., 1.),
-                    LoadedBallComponent,
-                ));
-            });
+        parent.spawn((
+            Transform::from_xyz(0.0, 400.0, 0.0),
+            Name::new("Dropper"),
+            Visibility::Visible,
+            Dropper,
+            children![(
+                Name::new("Ball Preview"),
+                Mesh2d(meshes.add(Circle::new(ball_size))),
+                MeshMaterial2d(materials.add(ColorMaterial::from_color(ball_colors[level]))),
+                Transform::from_xyz(0.0, 0., 1.),
+                LoadedBallComponent,
+            )],
+        ));
     });
 }
 
 fn dropper_movement(
-    mut dropper_query: Query<&mut Transform, With<Dropper>>,
+    dropper_query: Single<&mut Transform, With<Dropper>>,
     time: Res<Time>,
     dropper_stats: Res<DropperStats>,
     input: Res<ActionState<Action>>,
 ) {
-    if let Ok(mut transform) = dropper_query.single_mut() {
-        let mut direction = Vec3::ZERO;
+    let mut transform = dropper_query.into_inner();
+    let mut direction = Vec3::ZERO;
 
-        if input.pressed(&Action::MoveLeft) {
-            direction += Vec3::new(-1., 0., 0.);
-        }
-
-        if input.pressed(&Action::MoveRight) {
-            direction += Vec3::new(1., 0., 0.);
-        }
-
-        if direction.length() > 0.0 {
-            direction = direction.normalize();
-        }
-
-        transform.translation += direction * dropper_stats.speed * time.delta_secs();
+    if input.pressed(&Action::MoveLeft) {
+        direction += Vec3::new(-1., 0., 0.);
     }
+
+    if input.pressed(&Action::MoveRight) {
+        direction += Vec3::new(1., 0., 0.);
+    }
+
+    if direction.length() > 0.0 {
+        direction = direction.normalize();
+    }
+
+    transform.translation += direction * dropper_stats.speed * time.delta_secs();
 }
 
 fn mouse_system(
@@ -162,21 +162,21 @@ fn mouse_system(
 }
 
 fn restrict_dropper_movement(
-    mut dropper_query: Query<&mut Transform, With<Dropper>>,
+    dropper_query: Single<&mut Transform, With<Dropper>>,
     loaded_ball: Res<LoadedBall>,
     ball_scaler: Res<BallScaler>,
 ) {
     let LoadedBall(level) = *loaded_ball;
     let ball_size = ball_scaler.initial_size * ball_scaler.size_multiplier.powf(level as f32);
     let min_x: f32 = -LEVEL_WIDTH / 2. + ball_size + 5.;
-
     let max_x: f32 = LEVEL_WIDTH / 2. - ball_size - 5.;
-    if let Ok(mut transform) = dropper_query.single_mut() {
-        if transform.translation.x < min_x {
-            transform.translation.x = min_x;
-        }
-        if transform.translation.x > max_x {
-            transform.translation.x = max_x;
-        }
+
+    let mut transform = dropper_query.into_inner();
+
+    if transform.translation.x < min_x {
+        transform.translation.x = min_x;
+    }
+    if transform.translation.x > max_x {
+        transform.translation.x = max_x;
     }
 }
